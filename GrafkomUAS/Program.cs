@@ -11,7 +11,7 @@ namespace GrafkomUAS
             var ourWindowSetting = new NativeWindowSettings()
             {
                 Size = new Vector2i(800, 600),
-                Title = "Pertemuan Camera"
+                Title = "UAS GRAFIKA KOMPUTER"
             };
             using (var win = new Windows(GameWindowSettings.Default, ourWindowSetting))
             {

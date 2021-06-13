@@ -13,172 +13,15 @@ namespace GrafkomUAS
 {
     class Windows : GameWindow
     {
-        //private readonly float[] _vertices =
-        //{
-        //     // Position          Normal
-        //    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // Front face
-        //     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        //     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        //     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        //    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        //    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        private Mesh mesh0;
 
-        //    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // Back face
-        //     0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        //     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        //     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        //    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        //    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-
-        //    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, // Left face
-        //    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        //    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        //    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        //    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        //    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-        //     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, // Right face
-        //     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-        //     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-        //     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-        //     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-        //     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-        //    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, // Bottom face
-        //     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-        //     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        //     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        //    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        //    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-        //    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, // Top face
-        //     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-        //     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        //     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        //    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        //    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-        //};
-        private readonly float[] _vertices =
-        {
-             //Positions          Normals              Texture coords
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-             0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
-
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
-        };
-        //Inverted Normal
-        //private readonly float[] _vertices =
-        //{
-        //     Positions          Normals              Texture coords
-        //    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f,
-        //     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 0.0f,
-        //     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f,
-        //     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f,
-        //    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 1.0f,
-        //    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f,
-
-        //    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  -1.0f,  0.0f, 0.0f,
-        //     0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  -1.0f,  1.0f, 0.0f,
-        //     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  -1.0f,  1.0f, 1.0f,
-        //     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  -1.0f,  1.0f, 1.0f,
-        //    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  -1.0f,  0.0f, 1.0f,
-        //    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  -1.0f,  0.0f, 0.0f,
-
-        //    -0.5f,  0.5f,  0.5f, 1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-        //    -0.5f,  0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-        //    -0.5f, -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        //    -0.5f, -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        //    -0.5f, -0.5f,  0.5f, 1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-        //    -0.5f,  0.5f,  0.5f, 1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-        //     0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-        //     0.5f,  0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-        //     0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        //     0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        //     0.5f, -0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-        //     0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-        //    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  0.0f, 1.0f,
-        //     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  1.0f, 1.0f,
-        //     0.5f, -0.5f,  0.5f,  0.0f, 1.0f,  0.0f,  1.0f, 0.0f,
-        //     0.5f, -0.5f,  0.5f,  0.0f, 1.0f,  0.0f,  1.0f, 0.0f,
-        //    -0.5f, -0.5f,  0.5f,  0.0f, 1.0f,  0.0f,  0.0f, 0.0f,
-        //    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  0.0f, 1.0f,
-
-        //    -0.5f,  0.5f, -0.5f,  0.0f,  -1.0f,  0.0f,  0.0f, 1.0f,
-        //     0.5f,  0.5f, -0.5f,  0.0f,  -1.0f,  0.0f,  1.0f, 1.0f,
-        //     0.5f,  0.5f,  0.5f,  0.0f,  -1.0f,  0.0f,  1.0f, 0.0f,
-        //     0.5f,  0.5f,  0.5f,  0.0f,  -1.0f,  0.0f,  1.0f, 0.0f,
-        //    -0.5f,  0.5f,  0.5f,  0.0f,  -1.0f,  0.0f,  0.0f, 0.0f,
-        //    -0.5f,  0.5f, -0.5f,  0.0f,  -1.0f,  0.0f,  0.0f, 1.0f
-        //};
-        //private readonly Vector3[] _cubePositions =
-        //{
-        //    new Vector3(0.0f, 0.0f, 0.0f),
-        //    new Vector3(2.0f, 5.0f, -15.0f),
-        //    new Vector3(-1.5f, -2.2f, -2.5f),
-        //    new Vector3(-3.8f, -2.0f, -12.3f),
-        //    new Vector3(2.4f, -0.4f, -3.5f),
-        //    new Vector3(-1.7f, 3.0f, -7.5f),
-        //    new Vector3(1.3f, -2.0f, -2.5f),
-        //    new Vector3(1.5f, 2.0f, -2.5f),
-        //    new Vector3(1.5f, 0.2f, -1.5f),
-        //    new Vector3(-1.3f, 1.0f, -1.5f)
-        //};
-        private readonly Vector3 _lightPos = new Vector3(0.0f, 0.0f, 0.0f);
-        private int _vertexBufferObject;
-        private int _vaoModel;
-        private int _vaoLamp;
-        private Shader _lampShader;
-        private Shader _lightingShader;
         private Camera _camera;
         private Vector3 _objectPos;
 
         private Vector2 _lastMousePosition;
         private bool _firstMove;
-        //// The texture containing information for the diffuse map, this would more commonly
-        //// just be called the color/texture of the object.
-        private Texture _diffuseMap;
 
-        //// The specular map is a black/white representation of how specular each part of the texture is.
-        private Texture _specularMap;
+        private Vector3 lightPos = new Vector3(1.0f, 0.0f, 0.0f);
         public Windows(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
         }
@@ -207,41 +50,23 @@ namespace GrafkomUAS
         {
             GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             GL.Enable(EnableCap.DepthTest);
-            _vertexBufferObject = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
-            _lightingShader = new Shader("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.vert", "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
-            _lampShader = new Shader("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.vert", "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.frag");
-            _vaoModel = GL.GenVertexArray();
-            GL.BindVertexArray(_vaoModel);
 
-            var vertexLocation = _lightingShader.GetAttribLocation("aPosition");
-            GL.EnableVertexAttribArray(vertexLocation);
-            //GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-            GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 0);
-            var normalLocation = _lightingShader.GetAttribLocation("aNormal");
-            GL.EnableVertexAttribArray(normalLocation);
-            //GL.VertexAttribPointer(normalLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
-            GL.VertexAttribPointer(normalLocation, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 3 * sizeof(float));
-            // The texture coords have now been added too, remember we only have 2 coordinates as the texture is 2d,
-            // so the size parameter should only be 2 for the texture coordinates.
-            var texCoordLocation = _lightingShader.GetAttribLocation("aTexCoords");
-            GL.EnableVertexAttribArray(texCoordLocation);
-            GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 8 * sizeof(float), 6 * sizeof(float));
-            _vaoLamp = GL.GenVertexArray();
-            GL.BindVertexArray(_vaoLamp);
-            vertexLocation = _lampShader.GetAttribLocation("aPosition");
-            GL.EnableVertexAttribArray(vertexLocation);
-            //GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-            GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 0);
-            // Our two textures are loaded in from memory, you should head over and
-            // check them out and compare them to the results.
-            _diffuseMap = Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/container2.png");
-            _specularMap = Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/container2_specular.png");
+            mesh0 = new Mesh("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
+                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
+            mesh0.LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/AmongUs3.obj");
+            mesh0.setupObject(2.0f, 2.0f);
+
+
+
+
+
             var _cameraPosInit = new Vector3(0, 0, 0);
             _camera = new Camera(_cameraPosInit, Size.X / (float)Size.Y);
             _camera.Yaw -= 90f;
             CursorGrabbed = true;
+
+            //Light Position
+            lightPos = new Vector3(1.0f, 1.0f, 1.0f);
 
             base.OnLoad();
         }
@@ -249,72 +74,8 @@ namespace GrafkomUAS
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.BindVertexArray(_vaoModel);
 
-            _diffuseMap.Use(TextureUnit.Texture0);
-            _specularMap.Use(TextureUnit.Texture1);
-            _lightingShader.Use();
-
-            _lightingShader.SetMatrix4("transform", Matrix4.Identity);
-            _lightingShader.SetMatrix4("view", _camera.GetViewMatrix());
-            _lightingShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
-
-            //_lightingShader.SetVector3("objectColor", new Vector3(1.0f, 0.5f, 0.31f));
-            //_lightingShader.SetVector3("lightColor", new Vector3(1.0f, 1.0f, 1.0f));
-            //_lightingShader.SetVector3("lightPos", _lightPos);
-            _lightingShader.SetVector3("viewPos", _camera.Position);
-            ////material settings
-            _lightingShader.SetInt("material.diffuse", 0);
-            _lightingShader.SetInt("material.specular", 1);
-            //_lightingShader.SetVector3("material.ambient", new Vector3(1.0f, 0.5f, 0.31f));
-            //_lightingShader.SetVector3("material.diffuse", new Vector3(1.0f, 0.5f, 0.31f));
-            //_lightingShader.SetVector3("material.specular", new Vector3(0.5f, 0.5f, 0.5f));
-            _lightingShader.SetFloat("material.shininess", 32.0f);
-            // This is where we change the lights color over time using the sin function
-            //Vector3 lightColor;
-            //float time = DateTime.Now.Second + DateTime.Now.Millisecond / 1000f;
-            //lightColor.X = (MathF.Sin(time * 2.0f) + 1) / 2f;
-            //lightColor.Y = (MathF.Sin(time * 0.7f) + 1) / 2f;
-            //lightColor.Z = (MathF.Sin(time * 1.3f) + 1) / 2f;
-
-            //// The ambient light is less intensive than the diffuse light in order to make it less dominant
-            //Vector3 ambientColor = lightColor * new Vector3(0.2f);
-            //Vector3 diffuseColor = lightColor * new Vector3(0.5f);
-
-            _lightingShader.SetVector3("light.position", _lightPos);
-            //_lightingShader.SetVector3("light.direction", new Vector3(-0.2f, -1.0f, -0.3f));
-            //_lightingShader.SetVector3("light.ambient", ambientColor);
-            //_lightingShader.SetVector3("light.diffuse", diffuseColor);
-            _lightingShader.SetVector3("light.ambient", new Vector3(0.2f));
-            _lightingShader.SetVector3("light.diffuse", new Vector3(0.5f));
-            _lightingShader.SetVector3("light.specular", new Vector3(1.0f, 1.0f, 1.0f));
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
-            //for (int i = 0; i < _cubePositions.Length; i++)
-            //{
-            //    // Then we translate said matrix by the cube position
-            //    Matrix4 model = Matrix4.CreateTranslation(_cubePositions[i]);
-            //    // We then calculate the angle and rotate the model around an axis
-            //    float angle = 20.0f * i;
-            //    model = model * Matrix4.CreateFromAxisAngle(new Vector3(1.0f, 0.3f, 0.5f), angle);
-            //    // Remember to set the model at last so it can be used by opentk
-            //    _lightingShader.SetMatrix4("transform", model);
-
-            //    // At last we draw all our cubes
-            //    GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
-            //}
-
-            GL.BindVertexArray(_vaoModel);
-
-            _lampShader.Use();
-
-            Matrix4 lampMatrix = Matrix4.CreateScale(0.2f); 
-            lampMatrix = lampMatrix * Matrix4.CreateTranslation(_lightPos);
-
-            _lampShader.SetMatrix4("transform", lampMatrix);
-            _lampShader.SetMatrix4("view", _camera.GetViewMatrix());
-            _lampShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
-
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+            mesh0.render(_camera, lightPos);
             SwapBuffers();
 
             base.OnRenderFrame(args);
