@@ -1,21 +1,14 @@
 #version 330 core
 out vec4 FragColor;
 
-//uniform vec3 objectColor;
-//uniform vec3 lightColor;
-//uniform vec3 lightPos;
-//The material is a collection of some values that we talked about in the last tutorial,
-//some crucial elements to the phong model.
 struct Material {
-    //vec3 ambient;
-    //vec3 diffuse;
-    //vec3 specular;
-    sampler2D diffuse;
-    sampler2D specular;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    sampler2D diffuse_sampler;
+    sampler2D specular_sampler;
     float shininess; //Shininess is the power the specular light is raised to
 };
-//The light contains all the values from the light source, how the ambient diffuse and specular values are from the light source.
-//This is technically what we were using in the last episode as we were only applying the phong model directly to the light.
 struct Light {
     vec3 position;
     //vec3 direction;
@@ -38,7 +31,8 @@ void main()
     //float ambientStrength = 0.1;
     //vec3 ambient = ambientStrength * lightColor;
     //vec3 ambient = light.ambient * material.ambient; //Remember to use the material here.
-    vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
+    //vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
+    vec3 ambient = light.ambient * vec3(texture(material.diffuse_sampler, TexCoords)) * material.ambient;
 
     //diffuse
     vec3 norm = normalize(Normal);
@@ -48,7 +42,8 @@ void main()
     float diff = max(dot(norm, lightDir), 0.0); //We make sure the value is non negative with the max function.
     //vec3 diffuse = diff * lightColor;
     //vec3 diffuse = light.diffuse * (diff * material.diffuse); //Remember to use the material here.
-    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
+    //vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse_sampler, TexCoords))
+    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse_sampler, TexCoords)) * material.diffuse;
 
     //specular
     float specularStrength = 0.5;
@@ -58,7 +53,8 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     //vec3 specular = specularStrength * spec * lightColor;
     //vec3 specular = light.specular * (spec * material.specular); //Remember to use the material here.
-    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
+    //vec3 specular = light.specular * spec * vec3(texture(material.specular_sampler, TexCoords))
+    vec3 specular = light.specular * spec * vec3(texture(material.specular_sampler, TexCoords)) * material.specular;
     //vec3 result = (ambient + diffuse + specular) * objectColor;
     vec3 result = ambient + diffuse + specular;
     FragColor = vec4(result, 1.0);

@@ -21,7 +21,7 @@ namespace GrafkomUAS
         private Vector2 _lastMousePosition;
         private bool _firstMove;
 
-        private Vector3 lightPos = new Vector3(1.0f, 0.0f, 0.0f);
+        private Vector3 lightPos;
         public Windows(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
         }
@@ -51,9 +51,16 @@ namespace GrafkomUAS
             GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             GL.Enable(EnableCap.DepthTest);
 
-            mesh0 = new Mesh("C:/Users/Carolyn/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
-                "C:/Users/Carolyn/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
-            mesh0.LoadObjFile("C:/Users/Carolyn/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources/abstract.obj");
+            //Light Position
+            lightPos = new Vector3(1.0f, 100.0f, 1.0f);
+
+            mesh0 = new Mesh("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
+                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
+
+            mesh0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            mesh0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            mesh0.LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/KleeBomb.obj");
+            mesh0.LoadMtlFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/KleeBomb.mtl");
             mesh0.setupObject(2.0f, 2.0f);
 
 
@@ -65,8 +72,7 @@ namespace GrafkomUAS
             _camera.Yaw -= 90f;
             CursorGrabbed = true;
 
-            //Light Position
-            lightPos = new Vector3(1.0f, 1.0f, 1.0f);
+            
 
             base.OnLoad();
         }

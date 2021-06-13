@@ -14,11 +14,13 @@ namespace GrafkomUAS
         List<Vector3> vertices = new List<Vector3>();
         List<Vector3> normals = new List<Vector3>();
         List<Vector3> textureVertices = new List<Vector3>();
+        
+        List<Material> materials = new List<Material>();
+
+        int _ebo;
         List<uint> vertexIndices = new List<uint>();
 
-        List<float> floatData = new List<float>();
         int _vbo;
-        int _ebo;
         int _vao;
         Shader _shader;
         Matrix4 transform;
@@ -107,9 +109,6 @@ namespace GrafkomUAS
             GL.BufferData(BufferTarget.ElementArrayBuffer, vertexIndices.Count * sizeof(uint),
                 vertexIndices.ToArray(), BufferUsageHint.StaticDraw);
 
-            _diffuseMap = Texture.LoadFromFile("C:/Users/Carolyn/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources/badLogic.jpg");
-            _specularMap = Texture.LoadFromFile("C:/Users/Carolyn/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources/container2_specular.png");
-
             //setting disini
             //                               x = 0 y = 0 z = 
             view = Matrix4.CreateTranslation(0.0f, 0.0f, -3.0f);
@@ -133,12 +132,12 @@ namespace GrafkomUAS
             //_shader.SetVector3("lightPos", _lightPos);
             _shader.SetVector3("viewPos", _camera.Position);
             ////material settings
-            _shader.SetInt("material.diffuse", 0);
-            _shader.SetInt("material.specular", 1);
-            //_shader.SetVector3("material.ambient", new Vector3(1.0f, 0.5f, 0.31f));
-            //_shader.SetVector3("material.diffuse", new Vector3(1.0f, 0.5f, 0.31f));
-            //_shader.SetVector3("material.specular", new Vector3(0.5f, 0.5f, 0.5f));
-            _shader.SetFloat("material.shininess", 32.0f);
+            _shader.SetInt("material.diffuse_sampler", 0);
+            _shader.SetInt("material.specular_sampler", 1);
+            _shader.SetVector3("material.ambient", materials[2].Ambient);
+            _shader.SetVector3("material.diffuse", materials[2].Diffuse);
+            _shader.SetVector3("material.specular", materials[2].Specular);
+            _shader.SetFloat("material.shininess", materials[2].Shininess);
             // This is where we change the lights color over time using the sin function
             //Vector3 lightColor;
             //float time = DateTime.Now.Second + DateTime.Now.Millisecond / 1000f;
@@ -196,14 +195,6 @@ namespace GrafkomUAS
                     //dan dia bakal kembali keatas lagi / melanjutkannya whilenya
                     if (words.Count == 0)
                         continue;
-
-                    //System.Console.WriteLine("New While");
-                    //foreach (string x in words)
-                    //               {
-                    //	System.Console.WriteLine("tes");
-                    //	System.Console.WriteLine(x);
-                    //               }
-                    //System.Console.WriteLine(words[0]);
                     string type = words[0];
                     //remove at -> menghapus data dalam suatu indexs dan otomatis data pada indeks
                     //berikutnya itu otomatis mundur kebelakang 1
@@ -231,17 +222,12 @@ namespace GrafkomUAS
                             break;
                         // face
                         case "f":
-                            //Console.WriteLine(words.Count);
                             foreach (string w in words)
                             {
                                 if (w.Length == 0)
                                     continue;
 
                                 string[] comps = w.Split('/');
-                                //Console.WriteLine(comps.Length);
-                                //Console.WriteLine(comps[0]);
-                                //Console.WriteLine(comps[1]);
-                                //Console.WriteLine(comps[2]);
                                 for(int i = 0; i < comps.Length; i++)
                                 {
                                     if (i == 0)
@@ -294,6 +280,85 @@ namespace GrafkomUAS
                 uint normalIndex = temp_normalsIndices[i];
                 Vector3 vec = temp_normals[(int)normalIndex - 1];
                 normals.Add(vec);
+            }
+        }
+        public void LoadMtlFile(string path)
+        {
+            List<string> name = new List<string>();
+            List<float> shininess = new List<float>();
+            List<Vector3> ambient = new List<Vector3>();
+            List<Vector3> diffuse = new List<Vector3>();
+            List<Vector3> specular = new List<Vector3>();
+            List<float> alpha = new List<float>();
+
+            //komputer ngecek, apakah file bisa diopen atau tidak
+            if (!File.Exists(path))
+            {
+                throw new FileNotFoundException("Unable to open \"" + path + "\", does not exist.");
+            }
+            //lanjut ke sini
+            using (StreamReader streamReader = new StreamReader(path))
+            {
+                while (!streamReader.EndOfStream)
+                {
+                    //aku ngambil 1 baris tersebut -> dimasukkan ke dalam List string -> dengan di split pakai spasi
+                    List<string> words = new List<string>(streamReader.ReadLine().ToLower().Split(' '));
+                    //removeAll(kondisi dimana penghapusan terjadi)
+                    words.RemoveAll(s => s == string.Empty);
+                    //Melakukan pengecekkan apakah dalam satu list -> ada isinya atau tidak list nya tersebut
+                    //kalau ada continue, perintah-perintah yang ada dibawahnya tidak akan dijalankan 
+                    //dan dia bakal kembali keatas lagi / melanjutkannya whilenya
+                    
+                    if (words.Count == 0)
+                        continue;
+                    Console.WriteLine(words[0]);
+                    string type = words[0];
+                    //remove at -> menghapus data dalam suatu indexs dan otomatis data pada indeks
+                    //berikutnya itu otomatis mundur kebelakang 1
+                    words.RemoveAt(0);
+
+                    for(int i = 0; i < words.Count; i++)
+                    {
+                        Console.WriteLine(words[i]);
+                    }
+
+
+                    switch (type)
+                    {
+                        case "newmtl":
+                            name.Add(words[0]);
+                            break;
+                        //Shininess
+                        case "ns":
+                            shininess.Add(float.Parse(words[0]));
+                            break;
+
+                        case "ka":
+                            ambient.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
+                            break;
+
+                        case "kd":
+                            diffuse.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
+                            break;
+
+                        case "ks":
+                            specular.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
+                            break;
+
+                        case "d":
+                            alpha.Add(float.Parse(words[0]));
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                
+            }
+
+            for(int i = 0; i < name.Count; i++)
+            {
+                materials.Add(new Material(name[i], shininess[i], ambient[i], diffuse[i], specular[i], alpha[i]));
             }
         }
         public void createBoxVertices(float x, float y, float z)
@@ -402,18 +467,7 @@ namespace GrafkomUAS
             textureVertices.Add(new Vector3(1.0f, 0.0f, 0.0f));
 
         }
-        public void hardcodeBoxVertices()
-        {
-            vertices.Add(new Vector3(-0.5f, 0.5f, -0.5f));
-            vertices.Add(new Vector3(0.5f, 0.5f, -0.5f));
-            vertices.Add(new Vector3(-0.5f, -0.5f, -0.5f));
-            vertices.Add(new Vector3(0.5f, -0.5f, -0.5f));
-            vertices.Add(new Vector3(-0.5f, 0.5f, 0.5f));
-            vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
-            vertices.Add(new Vector3(-0.5f, -0.5f, 0.5f));
-            vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
-        }
-
+       
         //TRANSFORMASI
         public Matrix4 getTransform()
         {
@@ -472,6 +526,15 @@ namespace GrafkomUAS
         public Shader getShader()
         {
             return _shader;
+        }
+
+        public void setDiffuseMap(string filepath)
+        {
+            _diffuseMap = Texture.LoadFromFile(filepath);
+        }
+        public void setSpecularMap(string filepath)
+        {
+            _specularMap = Texture.LoadFromFile(filepath);
         }
     }
 }
