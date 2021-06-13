@@ -41,9 +41,13 @@ namespace GrafkomUAS
         }
         public void setupObject(float sizeX, float sizeY)
         {
-            //ToData();
             //Inisialisasi Transformasi
             transform = Matrix4.Identity;
+
+            Console.WriteLine("Vertices: " + vertices.Count);
+            Console.WriteLine(vertices[0].X + " " + vertices[0].Y + " " + vertices[0].Z);
+            Console.WriteLine("Normals: " + normals.Count);
+            Console.WriteLine("TextureVertices: " + textureVertices.Count);
 
             //Vertices
             //Inisialiasi VBO
@@ -63,8 +67,17 @@ namespace GrafkomUAS
             //Inisialiasi VBO
             _vbo = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-            GL.BufferData(BufferTarget.ArrayBuffer, normals.Count * Vector3.SizeInBytes,
+            if(normals.Count < vertices.Count)
+            {
+                GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * Vector3.SizeInBytes,
+               vertices.ToArray(), BufferUsageHint.StaticDraw);
+            }
+            else
+            {
+                GL.BufferData(BufferTarget.ArrayBuffer, normals.Count * Vector3.SizeInBytes,
                 normals.ToArray(), BufferUsageHint.StaticDraw);
+            }
+            
 
             var normalLocation = _shader.GetAttribLocation("aNormal");
             GL.EnableVertexAttribArray(normalLocation);
@@ -74,8 +87,16 @@ namespace GrafkomUAS
             //Inisialiasi VBO
             _vbo = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-            GL.BufferData(BufferTarget.ArrayBuffer, textureVertices.Count * Vector3.SizeInBytes,
+            if (textureVertices.Count < vertices.Count)
+            {
+                GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * Vector3.SizeInBytes,
+               vertices.ToArray(), BufferUsageHint.StaticDraw);
+            }
+            else
+            {
+                GL.BufferData(BufferTarget.ArrayBuffer, textureVertices.Count * Vector3.SizeInBytes,
                 textureVertices.ToArray(), BufferUsageHint.StaticDraw);
+            }
             var texCoordLocation = _shader.GetAttribLocation("aTexCoords");
             GL.EnableVertexAttribArray(texCoordLocation);
             GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
@@ -86,8 +107,8 @@ namespace GrafkomUAS
             GL.BufferData(BufferTarget.ElementArrayBuffer, vertexIndices.Count * sizeof(uint),
                 vertexIndices.ToArray(), BufferUsageHint.StaticDraw);
 
-            _diffuseMap = Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/container2.png");
-            _specularMap = Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/container2_specular.png");
+            _diffuseMap = Texture.LoadFromFile("C:/Users/Carolyn/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources/badLogic.jpg");
+            _specularMap = Texture.LoadFromFile("C:/Users/Carolyn/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources/container2_specular.png");
 
             //setting disini
             //                               x = 0 y = 0 z = 
@@ -209,17 +230,45 @@ namespace GrafkomUAS
                             temp_normals.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
                             break;
                         // face
-                        case "f":                            
+                        case "f":
+                            //Console.WriteLine(words.Count);
                             foreach (string w in words)
                             {
                                 if (w.Length == 0)
                                     continue;
 
                                 string[] comps = w.Split('/');
-                                temp_vertexIndices.Add(uint.Parse(comps[0]));
-                                temp_textureIndices.Add(uint.Parse(comps[1]));
-                                temp_normalsIndices.Add(uint.Parse(comps[2]));
-                                
+                                //Console.WriteLine(comps.Length);
+                                //Console.WriteLine(comps[0]);
+                                //Console.WriteLine(comps[1]);
+                                //Console.WriteLine(comps[2]);
+                                for(int i = 0; i < comps.Length; i++)
+                                {
+                                    if (i == 0)
+                                    {
+                                        if(comps[0].Length > 0)
+                                        {
+                                            temp_vertexIndices.Add(uint.Parse(comps[0]));
+                                        }
+                                        
+                                    }
+                                    else if (i == 1)
+                                    {
+                                        if (comps[1].Length > 0)
+                                        {
+                                            temp_textureIndices.Add(uint.Parse(comps[1]));
+                                        }
+    
+                                    }
+                                    else if (i == 2)
+                                    {
+                                        if (comps[2].Length > 0)
+                                        {
+                                            temp_normalsIndices.Add(uint.Parse(comps[2]));
+                                        }
+
+                                    }
+                                }
 
                             }
                             break;
@@ -234,16 +283,17 @@ namespace GrafkomUAS
                 uint vertexIndex = temp_vertexIndices[i];
                 vertices.Add(temp_vertices[(int)vertexIndex - 1]);
             }
-            for(int i = 0; i < temp_normalsIndices.Count; i++)
-            {
-                uint normalIndex = temp_normalsIndices[i];
-                Vector3 vec = temp_normals[(int)normalIndex - 1];
-                normals.Add(vec);
-            }
+            
             for (int i = 0; i < temp_textureIndices.Count; i++)
             {
                 uint textureIndex = temp_textureIndices[i];
                 textureVertices.Add(temp_textureVertices[(int)textureIndex - 1]);
+            }
+            for (int i = 0; i < temp_normalsIndices.Count; i++)
+            {
+                uint normalIndex = temp_normalsIndices[i];
+                Vector3 vec = temp_normals[(int)normalIndex - 1];
+                normals.Add(vec);
             }
         }
         public void createBoxVertices(float x, float y, float z)
