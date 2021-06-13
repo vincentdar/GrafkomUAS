@@ -90,7 +90,7 @@ namespace GrafkomUAS
             GL.BufferData(BufferTarget.ElementArrayBuffer, vertexIndices.Count * sizeof(uint),
                 vertexIndices.ToArray(), BufferUsageHint.StaticDraw);
 
-            _diffuseMap = Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/container2.png");
+            _diffuseMap = Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/badLogic.jpg");
             _specularMap = Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/container2_specular.png");
 
             //setting disini

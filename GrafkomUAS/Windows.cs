@@ -53,7 +53,7 @@ namespace GrafkomUAS
 
             mesh0 = new Mesh("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
                 "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
-            mesh0.LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/AmongUs3.obj");
+            mesh0.LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/jurasinTriangulate.obj");
             mesh0.setupObject(2.0f, 2.0f);
 
 
