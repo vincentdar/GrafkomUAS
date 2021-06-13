@@ -41,9 +41,13 @@ namespace GrafkomUAS
         }
         public void setupObject(float sizeX, float sizeY)
         {
-            //ToData();
             //Inisialisasi Transformasi
             transform = Matrix4.Identity;
+
+            Console.WriteLine("Vertices: " + vertices.Count);
+            Console.WriteLine(vertices[0].X + " " + vertices[0].Y + " " + vertices[0].Z);
+            Console.WriteLine("Normals: " + normals.Count);
+            Console.WriteLine("TextureVertices: " + textureVertices.Count);
 
             //Vertices
             //Inisialiasi VBO
