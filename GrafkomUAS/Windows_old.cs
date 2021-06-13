@@ -58,50 +58,85 @@ namespace GrafkomUAS
         //    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
         //    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
         //};
+        //Triangles
+        //private readonly float[] _vertices =
+        //{
+        //     //Positions          Normals              Texture coords
+        //    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f, // Front face
+        //     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+        //     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+        //     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+        //    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+        //    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+
+        //    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f, // Back face
+        //     0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
+        //     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+        //     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+        //    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
+        //    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+
+        //    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // Left face
+        //    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+        //    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+        //    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+        //    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+        //    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+
+        //     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // Right face
+        //     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+        //     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+        //     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+        //     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+        //     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+
+        //    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f, // Bottom face
+        //     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+        //     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+        //     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+        //    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+        //    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+
+        //    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // Top face
+        //     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+        //     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+        //     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+        //    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+        //    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
+        //};
+        //Quads
         private readonly float[] _vertices =
         {
              //Positions          Normals              Texture coords
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f, // Front face
-             0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+            -0.5f, 0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f, // Front face
+             0.5f, 0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+             0.5f,  -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+             -0.5f,  -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
 
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f, // Back face
+            -0.5f, 0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f, // Back face
              0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+             0.5f,  -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+             -0.5f,  -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
 
             -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // Left face
             -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
             -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+            -0.5f, -0.5f, 0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
 
              0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // Right face
              0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
              0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+             0.5f, -0.5f, 0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
 
             -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f, // Bottom face
              0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
              0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+             -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
 
             -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // Top face
              0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
              0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
+             -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
         };
         //Inverted Normal
         //private readonly float[] _vertices =
@@ -162,7 +197,7 @@ namespace GrafkomUAS
         //    new Vector3(1.5f, 0.2f, -1.5f),
         //    new Vector3(-1.3f, 1.0f, -1.5f)
         //};
-        private readonly Vector3 _lightPos = new Vector3(0.0f, 0.0f, 0.0f);
+        private readonly Vector3 _lightPos = new Vector3(1.0f, 1.0f, 1.0f);
         private int _vertexBufferObject;
         private int _vaoModel;
         private int _vaoLamp;
@@ -210,8 +245,10 @@ namespace GrafkomUAS
             _vertexBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
-            _lightingShader = new Shader("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.vert", "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
-            _lampShader = new Shader("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.vert", "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.frag");
+            _lightingShader = new Shader("C:/Users/Carolyn/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
+                "C:/Users/Carolyn/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
+            _lampShader = new Shader("C:/Users/Carolyn/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
+                "C:/Users/Carolyn/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Shaders/shader.frag");
             _vaoModel = GL.GenVertexArray();
             GL.BindVertexArray(_vaoModel);
 
@@ -236,8 +273,8 @@ namespace GrafkomUAS
             GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 0);
             // Our two textures are loaded in from memory, you should head over and
             // check them out and compare them to the results.
-            _diffuseMap = Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/container2.png");
-            _specularMap = Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/container2_specular.png");
+            _diffuseMap = Texture.LoadFromFile("C:/Users/Carolyn/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources/container2.png");
+            _specularMap = Texture.LoadFromFile("C:/Users/Carolyn/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources/container2_specular.png");
             var _cameraPosInit = new Vector3(0, 0, 0);
             _camera = new Camera(_cameraPosInit, Size.X / (float)Size.Y);
             _camera.Yaw -= 90f;
@@ -288,7 +325,7 @@ namespace GrafkomUAS
             _lightingShader.SetVector3("light.ambient", new Vector3(0.2f));
             _lightingShader.SetVector3("light.diffuse", new Vector3(0.5f));
             _lightingShader.SetVector3("light.specular", new Vector3(1.0f, 1.0f, 1.0f));
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+            GL.DrawArrays(PrimitiveType.Quads, 0, 8);
             //for (int i = 0; i < _cubePositions.Length; i++)
             //{
             //    // Then we translate said matrix by the cube position
@@ -314,7 +351,7 @@ namespace GrafkomUAS
             _lampShader.SetMatrix4("view", _camera.GetViewMatrix());
             _lampShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
 
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 24);
             SwapBuffers();
 
             base.OnRenderFrame(args);
