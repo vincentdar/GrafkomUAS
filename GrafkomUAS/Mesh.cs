@@ -128,7 +128,7 @@ namespace GrafkomUAS
                 meshobj.setupObject(sizeX, sizeY);
             }
         }
-        public void render(Camera _camera, Light light)
+        public void render(Camera _camera, List<Light> light)
         {
             //render itu akan selalu terpanggil setiap frame
             GL.BindVertexArray(_vao);
@@ -165,11 +165,16 @@ namespace GrafkomUAS
                 _shader.SetFloat("material.shininess", 128.0f);
             }
 
-            _shader.SetVector3("light.position", light.Position);
-            //_shader.SetVector3("light.direction", new Vector3(-0.2f, -1.0f, -0.3f));
-            _shader.SetVector3("light.ambient", light.Ambient);
-            _shader.SetVector3("light.diffuse", light.Diffuse);
-            _shader.SetVector3("light.specular", light.Specular);
+            for(int i = 0; i < light.Count; i++)
+            {
+
+                _shader.SetVector3("lights[" + i + "].position", light[i].Position);
+                //_shader.SetVector3("lights[" + i + "].direction", new Vector3(-0.2f, -1.0f, -0.3f));
+                _shader.SetVector3("lights[" + i + "].ambient", light[i].Ambient);
+                _shader.SetVector3("lights[" + i + "].diffuse", light[i].Diffuse);
+                _shader.SetVector3("lights[" + i + "].specular", light[i].Specular);
+            }
+            
 
             //perlu diganti di parameter 2
             GL.DrawArrays(PrimitiveType.Triangles, 0, vertices.Count);

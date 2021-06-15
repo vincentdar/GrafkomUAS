@@ -14,7 +14,10 @@ namespace GrafkomUAS
     class Windows : GameWindow
     {
         private Mesh mesh0;
+
         private Mesh lamp0;
+        private Mesh lamp1;
+        private Mesh lamp2;
         Dictionary<string, List<Material>> materials_dict = new Dictionary<string, List<Material>>();
 
         private Camera _camera;
@@ -24,7 +27,8 @@ namespace GrafkomUAS
         private bool _firstMove;
 
         //Light
-        private Light light;
+
+        List<Light> lights = new List<Light>();
         public Windows(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
         }
@@ -55,10 +59,14 @@ namespace GrafkomUAS
             GL.Enable(EnableCap.DepthTest);
 
             //Light Position
-            light = new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
-                new Vector3(1.0f, 1.0f, 1.0f), new Vector3(1.0f, 1.0f, 1.0f));
+            lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
+                new Vector3(0.0f, 0.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f)));
+            lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
+                new Vector3(1.0f, 0.0f, 0.0f), new Vector3(1.0f, 0.0f, 0.0f)));
+            lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
+                new Vector3(0.0f, 1.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f)));
 
-            mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCube.obj", false);
+            mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/KleeBomb.obj", false);
             mesh0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             mesh0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             mesh0.setupObject(1.0f, 1.0f);
@@ -67,15 +75,29 @@ namespace GrafkomUAS
             lamp0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp0.setupObject(1.0f, 1.0f);
-            lamp0.translate(new Vector3(0.6f));
-            light.Position = lamp0.getTransform().ExtractTranslation();
+            lamp0.translate(new Vector3(0.4f, 0.0f, 0.0f));
+            lights[0].Position = lamp0.getTransform().ExtractTranslation();
+
+            lamp1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
+            lamp1.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            lamp1.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            lamp1.setupObject(1.0f, 1.0f);
+            lamp1.translate(new Vector3(-0.4f, 0.0f, 0.0f));
+            lights[1].Position = lamp1.getTransform().ExtractTranslation();
+
+            lamp2 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
+            lamp2.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            lamp2.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            lamp2.setupObject(1.0f, 1.0f);
+            lamp2.translate(new Vector3(0.0f, 0.8f, 0.0f));
+            lights[2].Position = lamp2.getTransform().ExtractTranslation();
 
 
             var _cameraPosInit = new Vector3(0, 0, 0);
             _camera = new Camera(_cameraPosInit, Size.X / (float)Size.Y);
             _camera.Yaw -= 90f;
             CursorGrabbed = true;
-
+            Console.WriteLine(GLFW.GetTime());
             base.OnLoad();
         }
 
@@ -83,8 +105,15 @@ namespace GrafkomUAS
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            mesh0.render(_camera, light);
-            lamp0.render(_camera, light);
+            if(GLFW.GetTime() > 0.1)
+            {
+                //LampRevolution();
+                GLFW.SetTime(0.0);
+            }
+            mesh0.render(_camera, lights);
+            lamp0.render(_camera, lights);
+            lamp1.render(_camera, lights);
+            lamp2.render(_camera, lights);
             SwapBuffers();
 
             base.OnRenderFrame(args);
@@ -577,6 +606,12 @@ namespace GrafkomUAS
                 materials.Add(new Material(name[i], shininess[i], ambient[i], diffuse[i], specular[i], alpha[i]));
             }
             return materials;
+        }
+
+        public void LampRevolution()
+        {
+            //light0.Position = lamp0.getTransform().ExtractTranslation();
+            lamp0.rotate(1f);
         }
     }
 }
