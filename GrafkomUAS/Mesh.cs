@@ -4,7 +4,6 @@ using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using OpenTK.Graphics.OpenGL4;
 
 namespace GrafkomUAS
@@ -14,12 +13,14 @@ namespace GrafkomUAS
         List<Vector3> vertices = new List<Vector3>();
         List<Vector3> normals = new List<Vector3>();
         List<Vector3> textureVertices = new List<Vector3>();
-        
-        List<Material> materials = new List<Material>();
+
+        Material material;
+        Light light;
 
         int _ebo;
         List<uint> vertexIndices = new List<uint>();
 
+        string name;
         int _vbo;
         int _vao;
         Shader _shader;
@@ -45,11 +46,6 @@ namespace GrafkomUAS
         {
             //Inisialisasi Transformasi
             transform = Matrix4.Identity;
-
-            Console.WriteLine("Vertices: " + vertices.Count);
-            Console.WriteLine(vertices[0].X + " " + vertices[0].Y + " " + vertices[0].Z);
-            Console.WriteLine("Normals: " + normals.Count);
-            Console.WriteLine("TextureVertices: " + textureVertices.Count);
 
             //Vertices
             //Inisialiasi VBO
@@ -113,8 +109,26 @@ namespace GrafkomUAS
             //                               x = 0 y = 0 z = 
             view = Matrix4.CreateTranslation(0.0f, 0.0f, -3.0f);
             projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), sizeX / sizeY, 0.1f, 100.0f);
+
+            //Materials
+            Console.WriteLine("================================================");
+            Console.WriteLine("Object Name: " + name);
+            Console.WriteLine("Vertices: " + vertices.Count);
+            Console.WriteLine("Normals: " + normals.Count);
+            Console.WriteLine("TextureVertices: " + textureVertices.Count);
+            if(material != null)
+            {
+                material.DisplayAttribute();
+            }
+            Console.WriteLine("================================================");
+            
+
+            foreach(var meshobj in child)
+            {
+                meshobj.setupObject(sizeX, sizeY);
+            }
         }
-        public void render(Camera _camera, Vector3 _lightPos)
+        public void render(Camera _camera, Light light)
         {
             //render itu akan selalu terpanggil setiap frame
             GL.BindVertexArray(_vao);
@@ -132,30 +146,30 @@ namespace GrafkomUAS
             //_shader.SetVector3("lightPos", _lightPos);
             _shader.SetVector3("viewPos", _camera.Position);
             ////material settings
-            _shader.SetInt("material.diffuse_sampler", 0);
-            _shader.SetInt("material.specular_sampler", 1);
-            _shader.SetVector3("material.ambient", materials[2].Ambient);
-            _shader.SetVector3("material.diffuse", materials[2].Diffuse);
-            _shader.SetVector3("material.specular", materials[2].Specular);
-            _shader.SetFloat("material.shininess", materials[2].Shininess);
-            // This is where we change the lights color over time using the sin function
-            //Vector3 lightColor;
-            //float time = DateTime.Now.Second + DateTime.Now.Millisecond / 1000f;
-            //lightColor.X = (MathF.Sin(time * 2.0f) + 1) / 2f;
-            //lightColor.Y = (MathF.Sin(time * 0.7f) + 1) / 2f;
-            //lightColor.Z = (MathF.Sin(time * 1.3f) + 1) / 2f;
+            if(material != null)
+            {
+                _shader.SetInt("material.diffuse_sampler", 0);
+                _shader.SetInt("material.specular_sampler", 1);
+                _shader.SetVector3("material.ambient", material.Ambient);
+                _shader.SetVector3("material.diffuse", material.Diffuse);
+                _shader.SetVector3("material.specular", material.Specular);
+                _shader.SetFloat("material.shininess", material.Shininess);
+            }
+            else
+            {
+                _shader.SetInt("material.diffuse_sampler", 0);
+                _shader.SetInt("material.specular_sampler", 1);
+                _shader.SetVector3("material.ambient", new Vector3(0.1f));
+                _shader.SetVector3("material.diffuse", new Vector3(1.0f));
+                _shader.SetVector3("material.specular", new Vector3(1.0f));
+                _shader.SetFloat("material.shininess", 128.0f);
+            }
 
-            //// The ambient light is less intensive than the diffuse light in order to make it less dominant
-            //Vector3 ambientColor = lightColor * new Vector3(0.2f);
-            //Vector3 diffuseColor = lightColor * new Vector3(0.5f);
-
-            _shader.SetVector3("light.position", _lightPos);
+            _shader.SetVector3("light.position", light.Position);
             //_shader.SetVector3("light.direction", new Vector3(-0.2f, -1.0f, -0.3f));
-            //_shader.SetVector3("light.ambient", ambientColor);
-            //_shader.SetVector3("light.diffuse", diffuseColor);
-            _shader.SetVector3("light.ambient", new Vector3(0.2f));
-            _shader.SetVector3("light.diffuse", new Vector3(0.5f));
-            _shader.SetVector3("light.specular", new Vector3(1.0f, 1.0f, 1.0f));
+            _shader.SetVector3("light.ambient", light.Ambient);
+            _shader.SetVector3("light.diffuse", light.Diffuse);
+            _shader.SetVector3("light.specular", light.Specular);
 
             //perlu diganti di parameter 2
             GL.DrawArrays(PrimitiveType.Triangles, 0, vertices.Count);
@@ -163,204 +177,12 @@ namespace GrafkomUAS
             //ada disini
             foreach (var meshobj in child)
             {
-                meshobj.render(_camera, _lightPos);
+                meshobj.render(_camera, light);
             }
         }
         
-        public void LoadObjFile(string path)
-        {
-            List<Vector3> temp_vertices = new List<Vector3>();
-            List<Vector3> temp_normals = new List<Vector3>();
-            List<Vector3> temp_textureVertices = new List<Vector3>();
-            List<uint> temp_vertexIndices = new List<uint>();
-            List<uint> temp_normalsIndices = new List<uint>();
-            List<uint> temp_textureIndices = new List<uint>();
-            //komputer ngecek, apakah file bisa diopen atau tidak
-            if (!File.Exists(path))
-            {
-                //mengakhiri program dan kita kasih peringatan
-                throw new FileNotFoundException("Unable to open \"" + path + "\", does not exist.");
-            }
-            //lanjut ke sini
-            using (StreamReader streamReader = new StreamReader(path))
-            {
-                while (!streamReader.EndOfStream)
-                {
-                    //aku ngambil 1 baris tersebut -> dimasukkan ke dalam List string -> dengan di split pakai spasi
-                    List<string> words = new List<string>(streamReader.ReadLine().ToLower().Split(' '));
-                    //removeAll(kondisi dimana penghapusan terjadi)
-                    words.RemoveAll(s => s == string.Empty);
-                    //Melakukan pengecekkan apakah dalam satu list -> ada isinya atau tidak list nya tersebut
-                    //kalau ada continue, perintah-perintah yang ada dibawahnya tidak akan dijalankan 
-                    //dan dia bakal kembali keatas lagi / melanjutkannya whilenya
-                    if (words.Count == 0)
-                        continue;
-                    string type = words[0];
-                    //remove at -> menghapus data dalam suatu indexs dan otomatis data pada indeks
-                    //berikutnya itu otomatis mundur kebelakang 1
-                    words.RemoveAt(0);
-                    
-
-                    
-                    switch (type)
-                    {
-                        // vertex
-                        //parse merubah dari string ke tipe variabel yang diinginkan
-                        //ada /10 karena saaat ini belum masuk materi camera
-                        case "v":
-                            temp_vertices.Add(new Vector3(float.Parse(words[0]) / 10, float.Parse(words[1]) / 10, float.Parse(words[2]) / 10));
-                            //vertices.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
-                            break;
-
-                        case "vt":
-                            temp_textureVertices.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]),
-                                                            words.Count < 3 ? 0 : float.Parse(words[2])));
-                            break;
-
-                        case "vn":
-                            temp_normals.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
-                            break;
-                        // face
-                        case "f":
-                            foreach (string w in words)
-                            {
-                                if (w.Length == 0)
-                                    continue;
-
-                                string[] comps = w.Split('/');
-                                for(int i = 0; i < comps.Length; i++)
-                                {
-                                    if (i == 0)
-                                    {
-                                        if(comps[0].Length > 0)
-                                        {
-                                            temp_vertexIndices.Add(uint.Parse(comps[0]));
-                                        }
-                                        
-                                    }
-                                    else if (i == 1)
-                                    {
-                                        if (comps[1].Length > 0)
-                                        {
-                                            temp_textureIndices.Add(uint.Parse(comps[1]));
-                                        }
-    
-                                    }
-                                    else if (i == 2)
-                                    {
-                                        if (comps[2].Length > 0)
-                                        {
-                                            temp_normalsIndices.Add(uint.Parse(comps[2]));
-                                        }
-
-                                    }
-                                }
-
-                            }
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-            }
-            for(int i = 0; i < temp_vertexIndices.Count; i++)
-            {
-                uint vertexIndex = temp_vertexIndices[i];
-                vertices.Add(temp_vertices[(int)vertexIndex - 1]);
-            }
-            
-            for (int i = 0; i < temp_textureIndices.Count; i++)
-            {
-                uint textureIndex = temp_textureIndices[i];
-                textureVertices.Add(temp_textureVertices[(int)textureIndex - 1]);
-            }
-            for (int i = 0; i < temp_normalsIndices.Count; i++)
-            {
-                uint normalIndex = temp_normalsIndices[i];
-                Vector3 vec = temp_normals[(int)normalIndex - 1];
-                normals.Add(vec);
-            }
-        }
-        public void LoadMtlFile(string path)
-        {
-            List<string> name = new List<string>();
-            List<float> shininess = new List<float>();
-            List<Vector3> ambient = new List<Vector3>();
-            List<Vector3> diffuse = new List<Vector3>();
-            List<Vector3> specular = new List<Vector3>();
-            List<float> alpha = new List<float>();
-
-            //komputer ngecek, apakah file bisa diopen atau tidak
-            if (!File.Exists(path))
-            {
-                throw new FileNotFoundException("Unable to open \"" + path + "\", does not exist.");
-            }
-            //lanjut ke sini
-            using (StreamReader streamReader = new StreamReader(path))
-            {
-                while (!streamReader.EndOfStream)
-                {
-                    //aku ngambil 1 baris tersebut -> dimasukkan ke dalam List string -> dengan di split pakai spasi
-                    List<string> words = new List<string>(streamReader.ReadLine().ToLower().Split(' '));
-                    //removeAll(kondisi dimana penghapusan terjadi)
-                    words.RemoveAll(s => s == string.Empty);
-                    //Melakukan pengecekkan apakah dalam satu list -> ada isinya atau tidak list nya tersebut
-                    //kalau ada continue, perintah-perintah yang ada dibawahnya tidak akan dijalankan 
-                    //dan dia bakal kembali keatas lagi / melanjutkannya whilenya
-                    
-                    if (words.Count == 0)
-                        continue;
-                    Console.WriteLine(words[0]);
-                    string type = words[0];
-                    //remove at -> menghapus data dalam suatu indexs dan otomatis data pada indeks
-                    //berikutnya itu otomatis mundur kebelakang 1
-                    words.RemoveAt(0);
-
-                    for(int i = 0; i < words.Count; i++)
-                    {
-                        Console.WriteLine(words[i]);
-                    }
-
-
-                    switch (type)
-                    {
-                        case "newmtl":
-                            name.Add(words[0]);
-                            break;
-                        //Shininess
-                        case "ns":
-                            shininess.Add(float.Parse(words[0]));
-                            break;
-
-                        case "ka":
-                            ambient.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
-                            break;
-
-                        case "kd":
-                            diffuse.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
-                            break;
-
-                        case "ks":
-                            specular.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
-                            break;
-
-                        case "d":
-                            alpha.Add(float.Parse(words[0]));
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-                
-            }
-
-            for(int i = 0; i < name.Count; i++)
-            {
-                materials.Add(new Material(name[i], shininess[i], ambient[i], diffuse[i], specular[i], alpha[i]));
-            }
-        }
+        
+        
         public void createBoxVertices(float x, float y, float z)
         {
             //biar lebih fleksibel jangan inisialiasi posisi dan 
@@ -473,25 +295,28 @@ namespace GrafkomUAS
         {
             return transform;
         }
-        public void rotate()
+        public void rotate(float angle)
         {
             //rotate parentnya
             //sumbu Y
-            transform = transform * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(20f));
+            transform = transform * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(angle));
             //rotate childnya
             foreach (var meshobj in child)
             {
-                meshobj.rotate();
+                meshobj.rotate(angle);
             }
         }
         public void scale()
         {
             transform = transform * Matrix4.CreateScale(1.9f);
         }
-        public void translate()
+        public void translate(Vector3 translation)
         {
-            //perpindahan sebanyak 0.1 ke x, 0.1 ke y, dan 0 ke z
-            transform = transform * Matrix4.CreateTranslation(0.1f, 0.1f, 0.0f);
+            transform = transform * Matrix4.CreateTranslation(translation);
+            foreach (var meshobj in child)
+            {
+                meshobj.translate(translation);
+            }
         }
 
         //SETTER GETTER
@@ -499,6 +324,55 @@ namespace GrafkomUAS
         {
             return vertices;
         }
+        public void setVertices(List<Vector3> vertices)
+        {
+            this.vertices = vertices;
+        }
+        public List<Vector3> getNormals()
+        {
+            return normals;
+        }
+        public void setNormals(List<Vector3> normals)
+        {
+            this.normals = normals;
+        }
+        public List<Vector3> getTextureVertices()
+        {
+            return textureVertices;
+        }
+        public void setTextureVertices(List<Vector3> textureVertices)
+        {
+            this.textureVertices = textureVertices;
+        }
+        public void setMaterial(Material material)
+        {
+            this.material = material;
+        }
+        public Material getMaterial()
+        {
+            return material;
+        }
+        public void setName(string name)
+        {
+            this.name = name;
+        }
+        public string getName()
+        {
+            return name;
+        }
+        public void AddVertices(Vector3 vec)
+        {
+            vertices.Add(vec);
+        }
+        public void AddTextureVertices(Vector3 vec)
+        {
+            textureVertices.Add(vec);
+        }
+        public void AddNormals(Vector3 vec)
+        {
+            normals.Add(vec);
+        }
+
         public List<uint> getVertexIndices()
         {
             return vertexIndices;
@@ -523,6 +397,10 @@ namespace GrafkomUAS
             return _vao;
         }
 
+        public void setShader(Shader shader)
+        {
+            this._shader = shader;
+        }
         public Shader getShader()
         {
             return _shader;
@@ -531,10 +409,20 @@ namespace GrafkomUAS
         public void setDiffuseMap(string filepath)
         {
             _diffuseMap = Texture.LoadFromFile(filepath);
+            //Give all the diffuse map
+            foreach (var meshobj in child)
+            {
+                meshobj.setDiffuseMap(filepath);
+            }
         }
         public void setSpecularMap(string filepath)
         {
             _specularMap = Texture.LoadFromFile(filepath);
+            //Give all the specular map
+            foreach (var meshobj in child)
+            {
+                meshobj.setSpecularMap(filepath);
+            }
         }
     }
 }

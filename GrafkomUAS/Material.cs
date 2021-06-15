@@ -34,5 +34,14 @@ namespace GrafkomUAS
         public Vector3 Diffuse { get => diffuse; set => diffuse = value; }
         public Vector3 Specular { get => specular; set => specular = value; }
         public float Alpha { get => alpha; set => alpha = value; }
+        public void DisplayAttribute()
+        {
+            Console.WriteLine("Name: " + name);
+            Console.WriteLine("Shininess: " + shininess);
+            Console.WriteLine("Ambient " + ambient);
+            Console.WriteLine("Diffuse: " + diffuse);
+            Console.WriteLine("Specular: " + specular);
+            Console.WriteLine("Alpha: " + alpha);
+        }
     }
 }
