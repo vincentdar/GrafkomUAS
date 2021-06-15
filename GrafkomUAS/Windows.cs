@@ -55,20 +55,20 @@ namespace GrafkomUAS
             GL.Enable(EnableCap.DepthTest);
 
             //Light Position
-            light = new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
+            light = new PointLight(new Vector3(-100f, 200f, 0.5f), new Vector3(1f, 1.0f, 1f),
                 new Vector3(1.0f, 1.0f, 1.0f), new Vector3(1.0f, 1.0f, 1.0f));
 
-            mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCube.obj", false);
-            mesh0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
-            mesh0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            mesh0 = LoadObjFile("C:/Users/ready/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources/castle.obj", false);
+            mesh0.setDiffuseMap("C:/Users/ready/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources/Castle-RGB.png");
+            mesh0.setSpecularMap("C:/Users/ready/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources/Castle-RGB.png");
             mesh0.setupObject(1.0f, 1.0f);
 
-            lamp0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
-            lamp0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
-            lamp0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            lamp0 = LoadObjFile("C:/Users/ready/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
+            lamp0.setDiffuseMap("C:/Users/ready/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            lamp0.setSpecularMap("C:/Users/ready/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp0.setupObject(1.0f, 1.0f);
             lamp0.translate(new Vector3(0.6f));
-            light.Position = lamp0.getTransform().ExtractTranslation();
+            //light.Position = lamp0.getTransform().ExtractTranslation();
 
 
             var _cameraPosInit = new Vector3(0, 0, 0);
@@ -276,8 +276,8 @@ namespace GrafkomUAS
 
         public Mesh LoadObjFile(string path, bool usemtl = true)
         {
-            Mesh mesh = new Mesh("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
-                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
+            Mesh mesh = new Mesh("C:/Users/ready/source/repos/vincentdar/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
+                "C:/Users/ready/source/repos/vincentdar/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
             List<Vector3> temp_vertices = new List<Vector3>();
             List<Vector3> temp_normals = new List<Vector3>();
             List<Vector3> temp_textureVertices = new List<Vector3>();
@@ -323,8 +323,8 @@ namespace GrafkomUAS
                         case "o":
                             if(mesh_count > 0)
                             {
-                                Mesh mesh_tmp = new Mesh("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
-                                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
+                                Mesh mesh_tmp = new Mesh("C:/Users/ready/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
+                                "C:/Users/ready/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
                                 
                                 for (int i = 0; i < temp_vertexIndices.Count; i++)
                                 {
@@ -390,7 +390,7 @@ namespace GrafkomUAS
                         case "mtllib":
                             if(usemtl)
                             {
-                                string resourceName = "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/" + words[0];
+                                string resourceName = "C:/Users/ready/Source/Repos/vincentdar/GrafkomUAS/GrafkomUAS/Resources" + words[0];
                                 string nameWOExt = words[0].Split(".")[0];
                                 Console.WriteLine(nameWOExt);
                                 materials_dict.Add(nameWOExt, LoadMtlFile(resourceName));
@@ -454,8 +454,8 @@ namespace GrafkomUAS
             if (mesh_created < mesh_count)
             {
 
-                Mesh mesh_tmp = new Mesh("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
-                            "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
+                Mesh mesh_tmp = new Mesh("C:/Users/ready/source/repos/vincentdar/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
+                "C:/Users/ready/source/repos/vincentdar/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
                 for (int i = 0; i < temp_vertexIndices.Count; i++)
                 {
                     uint vertexIndex = temp_vertexIndices[i];

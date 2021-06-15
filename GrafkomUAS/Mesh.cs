@@ -89,6 +89,8 @@ namespace GrafkomUAS
             {
                 GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * Vector3.SizeInBytes,
                vertices.ToArray(), BufferUsageHint.StaticDraw);
+
+                
             }
             else
             {
