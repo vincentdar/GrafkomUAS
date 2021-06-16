@@ -66,28 +66,28 @@ namespace GrafkomUAS
             lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
                 new Vector3(0.0f, 1.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f), 0.8f, 0.8f, 0.8f));
 
-            mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/torusMonkey.obj");
-            mesh0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
-            mesh0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TorusMonkey.obj");
+            //mesh0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            //mesh0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             mesh0.setupObject(1.0f, 1.0f);
 
             lamp0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
-            lamp0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
-            lamp0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            //lamp0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            //lamp0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp0.setupObject(1.0f, 1.0f);
             lamp0.translate(new Vector3(0.2f, 0.3f, 0.3f));
             lights[0].Position = lamp0.getTransform().ExtractTranslation();
 
             lamp1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
-            lamp1.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
-            lamp1.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            //lamp1.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            //lamp1.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp1.setupObject(1.0f, 1.0f);
             lamp1.translate(new Vector3(-0.4f, 0.0f, 0.0f));
             lights[1].Position = lamp1.getTransform().ExtractTranslation();
 
             lamp2 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
-            lamp2.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
-            lamp2.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            //lamp2.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            //lamp2.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp2.setupObject(1.0f, 1.0f);
             lamp2.translate(new Vector3(0.0f, 0.6f, 0.0f));
             lights[2].Position = lamp2.getTransform().ExtractTranslation();
@@ -97,7 +97,9 @@ namespace GrafkomUAS
             _camera = new Camera(_cameraPosInit, Size.X / (float)Size.Y);
             _camera.Yaw -= 90f;
             CursorGrabbed = true;
+
             Console.WriteLine(GLFW.GetTime());
+
             base.OnLoad();
         }
 
@@ -319,32 +321,24 @@ namespace GrafkomUAS
             string material_library = "";
             int mesh_count = 0;
             int mesh_created = 0;
-            //komputer ngecek, apakah file bisa diopen atau tidak
+
             if (!File.Exists(path))
             {
-                //mengakhiri program dan kita kasih peringatan
                 throw new FileNotFoundException("Unable to open \"" + path + "\", does not exist.");
             }
-            //lanjut ke sini
+
             using (StreamReader streamReader = new StreamReader(path))
             {
                 while (!streamReader.EndOfStream)
                 {
-                    //aku ngambil 1 baris tersebut -> dimasukkan ke dalam List string -> dengan di split pakai spasi
                     List<string> words = new List<string>(streamReader.ReadLine().Split(' '));
-                    //removeAll(kondisi dimana penghapusan terjadi)
                     words.RemoveAll(s => s == string.Empty);
-                    //Melakukan pengecekkan apakah dalam satu list -> ada isinya atau tidak list nya tersebut
-                    //kalau ada continue, perintah-perintah yang ada dibawahnya tidak akan dijalankan 
-                    //dan dia bakal kembali keatas lagi / melanjutkannya whilenya
+
                     if (words.Count == 0)
                         continue;
                     string type = words[0];
-                    //remove at -> menghapus data dalam suatu indexs dan otomatis data pada indeks
-                    //berikutnya itu otomatis mundur kebelakang 1
+
                     words.RemoveAt(0);
-
-
 
                     switch (type)
                     {
@@ -401,12 +395,8 @@ namespace GrafkomUAS
                             temp_name.Add(words[0]);
                             mesh_count++;
                             break;
-                        // vertex
-                        //parse merubah dari string ke tipe variabel yang diinginkan
-                        //ada /10 karena saaat ini belum masuk materi camera
                         case "v":
                             temp_vertices.Add(new Vector3(float.Parse(words[0]) / 10, float.Parse(words[1]) / 10, float.Parse(words[2]) / 10));
-                            //vertices.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
                             break;
 
                         case "vt":

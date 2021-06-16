@@ -27,11 +27,7 @@ namespace GrafkomUAS
         Matrix4 view;
         Matrix4 projection;
 
-        //// The texture containing information for the diffuse map, this would more commonly
-        //// just be called the color/texture of the object.
         private Texture _diffuseMap;
-
-        //// The specular map is a black/white representation of how specular each part of the texture is.
         private Texture _specularMap;
 
 
@@ -98,14 +94,7 @@ namespace GrafkomUAS
             GL.EnableVertexAttribArray(texCoordLocation);
             GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
 
-            //Elements
-            _ebo = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _ebo);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, vertexIndices.Count * sizeof(uint),
-                vertexIndices.ToArray(), BufferUsageHint.StaticDraw);
-
-            //setting disini
-            //                               x = 0 y = 0 z = 
+            //Camera
             view = Matrix4.CreateTranslation(0.0f, 0.0f, -3.0f);
             projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), sizeX / sizeY, 0.1f, 100.0f);
 
@@ -113,6 +102,7 @@ namespace GrafkomUAS
             if(material != null)
             {
                 _diffuseMap = material.Map_Kd;
+                _specularMap = material.Map_Ka;
             }
             
             //Materials
@@ -138,8 +128,12 @@ namespace GrafkomUAS
         {
             //render itu akan selalu terpanggil setiap frame
             GL.BindVertexArray(_vao);
-            _diffuseMap.Use(TextureUnit.Texture0);
-            _specularMap.Use(TextureUnit.Texture1);
+            if(material != null)
+            {
+                _diffuseMap.Use(TextureUnit.Texture0);
+                _specularMap.Use(TextureUnit.Texture1);
+            }
+            
             _shader.Use();
 
             
@@ -184,8 +178,6 @@ namespace GrafkomUAS
                 _shader.SetFloat("lights[" + i + "].quadratic", pointLight.Quadratic);
             }
             
-
-            //perlu diganti di parameter 2
             GL.DrawArrays(PrimitiveType.Triangles, 0, vertices.Count);
 
             //ada disini
