@@ -55,7 +55,7 @@ namespace GrafkomUAS
 
         protected override void OnLoad()
         {
-            GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            GL.ClearColor(0.1f, 0.1f, 0.15f, 1.0f);
             GL.Enable(EnableCap.DepthTest);
 
             //Light Position
@@ -75,7 +75,7 @@ namespace GrafkomUAS
             lamp0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp0.setupObject(1.0f, 1.0f);
-            lamp0.translate(new Vector3(0.4f, 0.0f, 0.0f));
+            lamp0.translate(new Vector3(1.5f, 0.0f, 0.0f));
             lights[0].Position = lamp0.getTransform().ExtractTranslation();
 
             lamp1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
@@ -105,7 +105,7 @@ namespace GrafkomUAS
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            if(GLFW.GetTime() > 0.1)
+            if(GLFW.GetTime() > 0.02)
             {
                 //LampRevolution();
                 GLFW.SetTime(0.0);
@@ -610,8 +610,16 @@ namespace GrafkomUAS
 
         public void LampRevolution()
         {
-            //light0.Position = lamp0.getTransform().ExtractTranslation();
-            lamp0.rotate(1f);
+            lights[0].Position = lamp0.getTransform().ExtractTranslation();
+            lamp0.rotate(0f, 1f, 0f);
+            lights[1].Position = lamp1.getTransform().ExtractTranslation();
+            lamp1.rotate(0f, 1f, 0f);
+            lights[2].Position = lamp2.getTransform().ExtractTranslation();
+            lamp2.rotate(1f, 0f, 0f);
+
+            mesh0.rotate(0f, -1f, 0f);
+
+
         }
     }
 }
