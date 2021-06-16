@@ -60,14 +60,14 @@ namespace GrafkomUAS
 
             //Light Position
             lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
-                new Vector3(0.0f, 0.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f)));
+                new Vector3(1.0f, 1.0f, 1.0f), new Vector3(1.0f, 1.0f, 1.0f)));
             lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
                 new Vector3(1.0f, 0.0f, 0.0f), new Vector3(1.0f, 0.0f, 0.0f)));
             lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
                 new Vector3(0.0f, 1.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f)));
 
-            mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/KleeBomb.obj", false);
-            mesh0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/MyKnight/MyKnight.obj", false);
+            mesh0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/MyKnight/armor.jpg");
             mesh0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             mesh0.setupObject(1.0f, 1.0f);
 
@@ -75,7 +75,7 @@ namespace GrafkomUAS
             lamp0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp0.setupObject(1.0f, 1.0f);
-            lamp0.translate(new Vector3(1.5f, 0.0f, 0.0f));
+            lamp0.translate(new Vector3(0.4f, 0.2f, 0.3f));
             lights[0].Position = lamp0.getTransform().ExtractTranslation();
 
             lamp1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
@@ -107,7 +107,7 @@ namespace GrafkomUAS
 
             if(GLFW.GetTime() > 0.02)
             {
-                //LampRevolution();
+                LampRevolution();
                 GLFW.SetTime(0.0);
             }
             mesh0.render(_camera, lights);
@@ -535,6 +535,8 @@ namespace GrafkomUAS
             List<Vector3> diffuse = new List<Vector3>();
             List<Vector3> specular = new List<Vector3>();
             List<float> alpha = new List<float>();
+            List<string> map_kd = new List<string>();
+            List<string> unique_map_kd = new List<string>();
 
             //komputer ngecek, apakah file bisa diopen atau tidak
             if (!File.Exists(path))
@@ -593,6 +595,8 @@ namespace GrafkomUAS
                         case "d":
                             alpha.Add(float.Parse(words[0]));
                             break;
+                        case "map_Kd":
+                            break;
 
                         default:
                             break;
@@ -601,9 +605,15 @@ namespace GrafkomUAS
 
             }
 
+            List<Texture> texture_map_Kd = new List<Texture>();
+            for(int i = 0; i < map_kd.Count; i++)
+            {
+                texture_map_Kd.Add(Texture.LoadFromFile(map_kd[i]));
+            }
+
             for (int i = 0; i < name.Count; i++)
             {
-                materials.Add(new Material(name[i], shininess[i], ambient[i], diffuse[i], specular[i], alpha[i]));
+                materials.Add(new Material(name[i], shininess[i], ambient[i], diffuse[i], specular[i], alpha[i], texture_map_Kd[0]));
             }
             return materials;
         }
