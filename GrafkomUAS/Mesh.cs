@@ -165,19 +165,14 @@ namespace GrafkomUAS
                 _shader.SetFloat("material.shininess", 128.0f);
             }
 
-            //Brute force through all lights
             for(int i = 0; i < light.Count; i++)
             {
-                PointLight pointLight= (PointLight)light[i];
-                _shader.SetVector3("lights[" + i + "].position", pointLight.Position);
-                //_shader.SetVector3("lights[" + i + "].direction", new Vector3(-0.2f, -1.0f, -0.3f));
-                _shader.SetVector3("lights[" + i + "].ambient", pointLight.Ambient);
-                _shader.SetVector3("lights[" + i + "].diffuse", pointLight.Diffuse);
-                _shader.SetVector3("lights[" + i + "].specular", pointLight.Specular);
-                _shader.SetFloat("lights[" + i + "].constant", pointLight.Constant);
-                _shader.SetFloat("lights[" + i + "].linear", pointLight.Linear);
-                _shader.SetFloat("lights[" + i + "].quadratic", pointLight.Quadratic);
 
+                _shader.SetVector3("lights[" + i + "].position", light[i].Position);
+                //_shader.SetVector3("lights[" + i + "].direction", new Vector3(-0.2f, -1.0f, -0.3f));
+                _shader.SetVector3("lights[" + i + "].ambient", light[i].Ambient);
+                _shader.SetVector3("lights[" + i + "].diffuse", light[i].Diffuse);
+                _shader.SetVector3("lights[" + i + "].specular", light[i].Specular);
             }
             
 
@@ -305,19 +300,15 @@ namespace GrafkomUAS
         {
             return transform;
         }
-        public void rotate(float angleX, float angleY, float angleZ)
+        public void rotate(float angle)
         {
             //rotate parentnya
-            //sumbu X
-            transform = transform * Matrix4.CreateRotationX(MathHelper.DegreesToRadians(angleX));
             //sumbu Y
-            transform = transform * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(angleY));
-            //sumbu Z
-            transform = transform * Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(angleZ));
+            transform = transform * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(angle));
             //rotate childnya
             foreach (var meshobj in child)
             {
-                meshobj.rotate(angleX, angleY, angleZ);
+                meshobj.rotate(angle);
             }
         }
         public void scale()
