@@ -19,8 +19,10 @@ namespace GrafkomUAS
         float alpha;
 
         Texture map_Kd;
+        Texture map_Ka;
 
-        public Material(string name, float shininess, Vector3 ambient, Vector3 diffuse, Vector3 specular, float alpha, Texture map_Kd)
+        public Material(string name, float shininess, Vector3 ambient, Vector3 diffuse, Vector3 specular,
+            float alpha, Texture map_Kd, Texture map_Ka)
         {
             this.name = name;
             this.shininess = shininess;
@@ -29,6 +31,7 @@ namespace GrafkomUAS
             this.specular = specular;
             this.alpha = alpha;
             this.map_Kd = map_Kd;
+            this.map_Ka = map_Ka;
         }
 
         public string Name { get => name; set => name = value; }
@@ -37,6 +40,9 @@ namespace GrafkomUAS
         public Vector3 Diffuse { get => diffuse; set => diffuse = value; }
         public Vector3 Specular { get => specular; set => specular = value; }
         public float Alpha { get => alpha; set => alpha = value; }
+        public Texture Map_Kd { get => map_Kd; set => map_Kd = value; }
+        public Texture Map_Ka { get => map_Ka; set => map_Ka = value; }
+
         public void DisplayAttribute()
         {
             Console.WriteLine("Name: " + name);

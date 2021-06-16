@@ -55,19 +55,19 @@ namespace GrafkomUAS
 
         protected override void OnLoad()
         {
-            GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             GL.Enable(EnableCap.DepthTest);
 
             //Light Position
             lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
-                new Vector3(1.0f, 1.0f, 1.0f), new Vector3(1.0f, 1.0f, 1.0f)));
+                new Vector3(0.0f, 0.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f), 0.5f, 0.5f, 0.5f));
             lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
-                new Vector3(1.0f, 0.0f, 0.0f), new Vector3(1.0f, 0.0f, 0.0f)));
+                new Vector3(1.0f, 0.0f, 0.0f), new Vector3(1.0f, 0.0f, 0.0f), 0.1f, 0.1f, 0.1f));
             lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
-                new Vector3(0.0f, 1.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f)));
+                new Vector3(0.0f, 1.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f), 0.8f, 0.8f, 0.8f));
 
-            mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/MyKnight/MyKnight.obj", false);
-            mesh0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/MyKnight/armor.jpg");
+            mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/torusMonkey.obj");
+            mesh0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             mesh0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             mesh0.setupObject(1.0f, 1.0f);
 
@@ -75,8 +75,7 @@ namespace GrafkomUAS
             lamp0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp0.setupObject(1.0f, 1.0f);
-            lamp0.translate(new Vector3(0.4f, 0.0f, 0.0f));
-            lamp0.translate(new Vector3(0.4f, 0.2f, 0.3f));
+            lamp0.translate(new Vector3(0.2f, 0.3f, 0.3f));
             lights[0].Position = lamp0.getTransform().ExtractTranslation();
 
             lamp1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
@@ -90,7 +89,7 @@ namespace GrafkomUAS
             lamp2.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp2.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp2.setupObject(1.0f, 1.0f);
-            lamp2.translate(new Vector3(0.0f, 0.8f, 0.0f));
+            lamp2.translate(new Vector3(0.0f, 0.6f, 0.0f));
             lights[2].Position = lamp2.getTransform().ExtractTranslation();
 
 
@@ -106,7 +105,7 @@ namespace GrafkomUAS
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            if(GLFW.GetTime() > 0.1)
+            if(GLFW.GetTime() > 0.02)
             {
                 LampRevolution();
                 GLFW.SetTime(0.0);
@@ -376,6 +375,7 @@ namespace GrafkomUAS
                                 //Material
                                 if(usemtl)
                                 {
+                                    
                                     List<Material> mtl = materials_dict[material_library];
                                     for (int i = 0; i < mtl.Count; i++)
                                     {
@@ -479,13 +479,12 @@ namespace GrafkomUAS
                     }
                 }
             }
-            Console.WriteLine("Mesh Count: " + mesh_count);
-            Console.WriteLine("Mesh Created: " + mesh_created);
             if (mesh_created < mesh_count)
             {
 
                 Mesh mesh_tmp = new Mesh("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
-                            "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
+                                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/lighting.frag");
+
                 for (int i = 0; i < temp_vertexIndices.Count; i++)
                 {
                     uint vertexIndex = temp_vertexIndices[i];
@@ -502,9 +501,11 @@ namespace GrafkomUAS
                     mesh_tmp.AddNormals(temp_normals[(int)normalIndex - 1]);
                 }
                 mesh_tmp.setName(temp_name[mesh_created]);
+
                 //Material
                 if (usemtl)
                 {
+
                     List<Material> mtl = materials_dict[material_library];
                     for (int i = 0; i < mtl.Count; i++)
                     {
@@ -514,14 +515,17 @@ namespace GrafkomUAS
                         }
                     }
                 }
+
+
                 if (mesh_count == 1)
                 {
                     mesh = mesh_tmp;
                 }
-                else if (mesh_count > 1)
+                else
                 {
                     mesh.child.Add(mesh_tmp);
                 }
+
                 mesh_created++;
             }
             return mesh;
@@ -537,7 +541,7 @@ namespace GrafkomUAS
             List<Vector3> specular = new List<Vector3>();
             List<float> alpha = new List<float>();
             List<string> map_kd = new List<string>();
-            List<string> unique_map_kd = new List<string>();
+            List<string> map_ka = new List<string>();
 
             //komputer ngecek, apakah file bisa diopen atau tidak
             if (!File.Exists(path))
@@ -549,80 +553,101 @@ namespace GrafkomUAS
             {
                 while (!streamReader.EndOfStream)
                 {
-                    //aku ngambil 1 baris tersebut -> dimasukkan ke dalam List string -> dengan di split pakai spasi
                     List<string> words = new List<string>(streamReader.ReadLine().Split(' '));
-                    //removeAll(kondisi dimana penghapusan terjadi)
                     words.RemoveAll(s => s == string.Empty);
-                    //Melakukan pengecekkan apakah dalam satu list -> ada isinya atau tidak list nya tersebut
-                    //kalau ada continue, perintah-perintah yang ada dibawahnya tidak akan dijalankan 
-                    //dan dia bakal kembali keatas lagi / melanjutkannya whilenya
 
                     if (words.Count == 0)
                         continue;
-                    //Console.WriteLine(words[0]);
+
                     string type = words[0];
-                    //remove at -> menghapus data dalam suatu indexs dan otomatis data pada indeks
-                    //berikutnya itu otomatis mundur kebelakang 1
+
                     words.RemoveAt(0);
-
-                    //for (int i = 0; i < words.Count; i++)
-                    //{
-                    //    Console.WriteLine(words[i]);
-                    //}
-
-
                     switch (type)
                     {
                         case "newmtl":
+                            if(map_kd.Count < name.Count)
+                            {
+                                map_kd.Add("white.jpg");
+                            }
+                            if(map_ka.Count < name.Count)
+                            {
+                                map_ka.Add("white.jpg");
+                            }
                             name.Add(words[0]);
                             break;
                         //Shininess
                         case "Ns":
                             shininess.Add(float.Parse(words[0]));
                             break;
-
                         case "Ka":
                             ambient.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
                             break;
-
                         case "Kd":
                             diffuse.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
                             break;
-
                         case "Ks":
                             specular.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
                             break;
-
                         case "d":
                             alpha.Add(float.Parse(words[0]));
                             break;
                         case "map_Kd":
+                            map_kd.Add(words[0]);
                             break;
-
+                        case "map_Ka":
+                            map_ka.Add(words[0]);
+                            break;
                         default:
                             break;
                     }
                 }
-
             }
 
-            List<Texture> texture_map_Kd = new List<Texture>();
+            if (map_kd.Count < name.Count)
+            {
+                map_kd.Add("white.jpg");
+            }
+            if (map_ka.Count < name.Count)
+            {
+                map_ka.Add("white.jpg");
+            }
+
+            Dictionary<string, Texture> texture_map_Kd = new Dictionary<string, Texture>();
             for(int i = 0; i < map_kd.Count; i++)
             {
-                texture_map_Kd.Add(Texture.LoadFromFile(map_kd[i]));
+                if(!texture_map_Kd.ContainsKey(map_kd[i]))
+                {
+                    texture_map_Kd.Add(map_kd[i],
+                        Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/" + map_kd[i]));
+                }
+            }
+
+            Dictionary<string, Texture> texture_map_Ka = new Dictionary<string, Texture>();
+            for (int i = 0; i < map_ka.Count; i++)
+            {
+                if (!texture_map_Ka.ContainsKey(map_ka[i]))
+                {
+                    texture_map_Ka.Add(map_ka[i],
+                        Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/" + map_ka[i]));
+                }
             }
 
             for (int i = 0; i < name.Count; i++)
             {
-                materials.Add(new Material(name[i], shininess[i], ambient[i], diffuse[i], specular[i], alpha[i], texture_map_Kd[0]));
+                materials.Add(new Material(name[i], shininess[i], ambient[i], diffuse[i], specular[i], 
+                    alpha[i], texture_map_Kd[map_kd[i]], texture_map_Ka[map_ka[i]]));
             }
             return materials;
         }
 
         public void LampRevolution()
         {
-            //light0.Position = lamp0.getTransform().ExtractTranslation();
-            lamp0.rotate(1f);
+            lights[0].Position = lamp0.getTransform().ExtractTranslation();
+            lamp0.rotate(0f, 1.0f, 0.0f);
+            lights[1].Position = lamp1.getTransform().ExtractTranslation();
+            lamp1.rotate(0f, -1f, 0.0f);
+            lights[2].Position = lamp2.getTransform().ExtractTranslation();
+            lamp2.rotate(1f, 0f, 0f);
         }
     }
 }
