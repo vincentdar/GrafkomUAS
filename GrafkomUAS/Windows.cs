@@ -55,27 +55,31 @@ namespace GrafkomUAS
 
         protected override void OnLoad()
         {
-            GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            GL.ClearColor(0.2f, 0.2f, 0.5f, 1.0f);
             GL.Enable(EnableCap.DepthTest);
 
-            //Light Position
-            lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
-                new Vector3(0.0f, 0.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f), 0.5f, 0.5f, 0.5f));
-            lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
-                new Vector3(1.0f, 0.0f, 0.0f), new Vector3(1.0f, 0.0f, 0.0f), 0.1f, 0.1f, 0.1f));
-            lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.1f, 0.1f, 0.1f),
-                new Vector3(0.0f, 1.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f), 0.8f, 0.8f, 0.8f));
+            //Initialize default material
+            InitDefaultMaterial();
 
-            mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TorusMonkey.obj");
+            //Light Position
+            lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
+                new Vector3(0.0f, 0.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f), 0.5f, 0.5f, 0.5f));
+            lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
+                new Vector3(1.0f, 0.0f, 0.0f), new Vector3(1.0f, 0.0f, 0.0f), 0.5f, 0.5f, 0.5f));
+            lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
+                new Vector3(0.0f, 1.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f), 0.5f, 0.5f, 0.5f));
+
+            mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/floor.obj");
             //mesh0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             //mesh0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             mesh0.setupObject(1.0f, 1.0f);
+            mesh0.translate(new Vector3(0f, -0.5f, 0f));
 
             lamp0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
             //lamp0.setDiffuseMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             //lamp0.setSpecularMap("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
             lamp0.setupObject(1.0f, 1.0f);
-            lamp0.translate(new Vector3(0.2f, 0.3f, 0.3f));
+            lamp0.translate(new Vector3(0.2f, 0.0f, 0.3f));
             lights[0].Position = lamp0.getTransform().ExtractTranslation();
 
             lamp1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
@@ -193,6 +197,15 @@ namespace GrafkomUAS
             {
                 _camera.Position -= _camera.Up * cameraSpeed * (float)args.Time;
             }
+            // Blinn
+            if(KeyboardState.IsKeyReleased(Keys.F1))
+            {
+                mesh0.setBlinn(!mesh0.getBlinn());
+                lamp0.setBlinn(!lamp0.getBlinn());
+                lamp1.setBlinn(!lamp1.getBlinn());
+                lamp2.setBlinn(!lamp2.getBlinn());
+
+            }
 
             const float _rotationSpeed = 0.02f;
             // K (atas -> Rotasi sumbu x)
@@ -305,6 +318,18 @@ namespace GrafkomUAS
             base.OnUpdateFrame(args);
         }
 
+        private void InitDefaultMaterial()
+        {
+            List<Material> materials = new List<Material>();
+            Texture diffuseMap = Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            Texture textureMap = Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/white.jpg");
+            materials.Add(new Material("Default", 128.0f, new Vector3(0.1f), new Vector3(1f), new Vector3(1f),
+                    1.0f, diffuseMap, textureMap));
+
+            materials_dict.Add("Default", materials);
+            
+        }
+
         public Mesh LoadObjFile(string path, bool usemtl = true)
         {
             Mesh mesh = new Mesh("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/shader.vert",
@@ -374,6 +399,17 @@ namespace GrafkomUAS
                                     for (int i = 0; i < mtl.Count; i++)
                                     {
                                         if (mtl[i].Name == current_materialsName)
+                                        {
+                                            mesh_tmp.setMaterial(mtl[i]);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    List<Material> mtl = materials_dict["Default"];
+                                    for (int i = 0; i < mtl.Count; i++)
+                                    {
+                                        if (mtl[i].Name == "Default")
                                         {
                                             mesh_tmp.setMaterial(mtl[i]);
                                         }
@@ -505,6 +541,17 @@ namespace GrafkomUAS
                         }
                     }
                 }
+                else
+                {
+                    List<Material> mtl = materials_dict["Default"];
+                    for (int i = 0; i < mtl.Count; i++)
+                    {
+                        if (mtl[i].Name == "Default")
+                        {
+                            mesh_tmp.setMaterial(mtl[i]);
+                        }
+                    }
+                }
 
 
                 if (mesh_count == 1)
@@ -607,6 +654,7 @@ namespace GrafkomUAS
             {
                 if(!texture_map_Kd.ContainsKey(map_kd[i]))
                 {
+                    Console.WriteLine("List of map_Kd key: " + map_kd[i]);
                     texture_map_Kd.Add(map_kd[i],
                         Texture.LoadFromFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/" + map_kd[i]));
                 }
@@ -627,9 +675,11 @@ namespace GrafkomUAS
                 materials.Add(new Material(name[i], shininess[i], ambient[i], diffuse[i], specular[i], 
                     alpha[i], texture_map_Kd[map_kd[i]], texture_map_Ka[map_ka[i]]));
             }
+
             return materials;
         }
 
+        //Animation
         public void LampRevolution()
         {
             lights[0].Position = lamp0.getTransform().ExtractTranslation();

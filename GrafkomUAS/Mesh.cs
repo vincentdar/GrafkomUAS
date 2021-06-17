@@ -16,9 +16,6 @@ namespace GrafkomUAS
 
         Material material;
 
-        int _ebo;
-        List<uint> vertexIndices = new List<uint>();
-
         string name;
         int _vbo;
         int _vao;
@@ -27,6 +24,7 @@ namespace GrafkomUAS
         Matrix4 view;
         Matrix4 projection;
 
+        bool blinn = false;
         private Texture _diffuseMap;
         private Texture _specularMap;
 
@@ -176,6 +174,15 @@ namespace GrafkomUAS
                 _shader.SetFloat("lights[" + i + "].linear", pointLight.Linear);
                 _shader.SetFloat("lights[" + i + "].constant", pointLight.Constant);
                 _shader.SetFloat("lights[" + i + "].quadratic", pointLight.Quadratic);
+                if(blinn)
+                {
+                    _shader.SetInt("blinn", 1);
+                }
+                else
+                {
+                    _shader.SetInt("blinn", 0);
+                }
+                
             }
             
             GL.DrawArrays(PrimitiveType.Triangles, 0, vertices.Count);
@@ -189,112 +196,6 @@ namespace GrafkomUAS
         
         
         
-        public void createBoxVertices(float x, float y, float z)
-        {
-            //biar lebih fleksibel jangan inisialiasi posisi dan 
-            //panjang kotak didalam tapi ditaruh ke parameter
-            float _positionX = x;
-            float _positionY = y;
-            float _positionZ = z;
-
-            float _boxLength = 2.0f;
-
-            //Buat temporary vector
-            Vector3 temp_vector;
-            //1. Inisialisasi vertex
-            // Titik 1
-            temp_vector.X = _positionX - _boxLength / 2.0f; // x 
-            temp_vector.Y = _positionY + _boxLength / 2.0f; // y
-            temp_vector.Z = _positionZ - _boxLength / 2.0f; // z
-
-            vertices.Add(temp_vector);
-
-            // Titik 2
-            temp_vector.X = _positionX + _boxLength / 2.0f; // x
-            temp_vector.Y = _positionY + _boxLength / 2.0f; // y
-            temp_vector.Z = _positionZ - _boxLength / 2.0f; // z
-
-            vertices.Add(temp_vector);
-            // Titik 3
-            temp_vector.X = _positionX - _boxLength / 2.0f; // x
-            temp_vector.Y = _positionY - _boxLength / 2.0f; // y
-            temp_vector.Z = _positionZ - _boxLength / 2.0f; // z
-            vertices.Add(temp_vector);
-
-            // Titik 4
-            temp_vector.X = _positionX + _boxLength / 2.0f; // x
-            temp_vector.Y = _positionY - _boxLength / 2.0f; // y
-            temp_vector.Z = _positionZ - _boxLength / 2.0f; // z
-
-            vertices.Add(temp_vector);
-
-            // Titik 5
-            temp_vector.X = _positionX - _boxLength / 2.0f; // x
-            temp_vector.Y = _positionY + _boxLength / 2.0f; // y
-            temp_vector.Z = _positionZ + _boxLength / 2.0f; // z
-
-            vertices.Add(temp_vector);
-
-            // Titik 6
-            temp_vector.X = _positionX + _boxLength / 2.0f; // x
-            temp_vector.Y = _positionY + _boxLength / 2.0f; // y
-            temp_vector.Z = _positionZ + _boxLength / 2.0f; // z
-
-            vertices.Add(temp_vector);
-
-            // Titik 7
-            temp_vector.X = _positionX - _boxLength / 2.0f; // x
-            temp_vector.Y = _positionY - _boxLength / 2.0f; // y
-            temp_vector.Z = _positionZ + _boxLength / 2.0f; // z
-
-            vertices.Add(temp_vector);
-
-            // Titik 8
-            temp_vector.X = _positionX + _boxLength / 2.0f; // x
-            temp_vector.Y = _positionY - _boxLength / 2.0f; // y
-            temp_vector.Z = _positionZ + _boxLength / 2.0f; // z
-
-            vertices.Add(temp_vector);
-            //2. Inisialisasi index vertex
-            vertexIndices = new List<uint> {
-                // Segitiga Depan 1
-                0, 1, 2,
-                // Segitiga Depan 2
-                1, 2, 3,
-                // Segitiga Atas 1
-                0, 4, 5,
-                // Segitiga Atas 2
-                0, 1, 5,
-                // Segitiga Kanan 1
-                1, 3, 5,
-                // Segitiga Kanan 2
-                3, 5, 7,
-                // Segitiga Kiri 1
-                0, 2, 4,
-                // Segitiga Kiri 2
-                2, 4, 6,
-                // Segitiga Belakang 1
-                4, 5, 6,
-                // Segitiga Belakang 2
-                5, 6, 7,
-                // Segitiga Bawah 1
-                2, 3, 6,
-                // Segitiga Bawah 2
-                3, 6, 7
-            };
-            
-
-
-            textureVertices.Add(new Vector3(0.0f, 1.0f, 0.0f));
-            textureVertices.Add(new Vector3(1.0f, 1.0f, 0.0f));
-            textureVertices.Add(new Vector3(0.0f, 0.0f, 0.0f));
-            textureVertices.Add(new Vector3(1.0f, 0.0f, 0.0f));
-            textureVertices.Add(new Vector3(0.0f, 1.0f, 0.0f));
-            textureVertices.Add(new Vector3(1.0f, 1.0f, 0.0f));
-            textureVertices.Add(new Vector3(0.0f, 0.0f, 0.0f));
-            textureVertices.Add(new Vector3(1.0f, 0.0f, 0.0f));
-
-        }
        
         //TRANSFORMASI
         public Matrix4 getTransform()
@@ -383,23 +284,9 @@ namespace GrafkomUAS
             normals.Add(vec);
         }
 
-        public List<uint> getVertexIndices()
-        {
-            return vertexIndices;
-        }
-
-        public void setVertexIndices(List<uint> temp)
-        {
-            vertexIndices = temp;
-        }
         public int getVertexBufferObject()
         {
             return _vbo;
-        }
-
-        public int getElementBufferObject()
-        {
-            return _ebo;
         }
 
         public int getVertexArrayObject()
@@ -444,6 +331,16 @@ namespace GrafkomUAS
             {
                 meshobj.setSpecularMap(filepath);
             }
+        }
+
+        public void setBlinn(bool b)
+        {
+            blinn = b;
+        }
+
+        public bool getBlinn()
+        {
+            return blinn;
         }
     }
 }

@@ -27,19 +27,31 @@ uniform Light lights[NR_POINT_LIGHTS];
 uniform Material material;
 
 uniform vec3 viewPos;
+uniform int blinn;
 
 in vec3 Normal;
 in vec3 FragPos;
 in vec2 TexCoords;
 
+//Using Blinn-Phong Model Shader
 vec3 CalcPointLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
 {
     vec3 lightDir = normalize(light.position - fragPos);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess); //Phong Model
+    
+    if (blinn == 1)
+    {
+        spec = pow(max(dot(viewDir, halfwayDir), 0.0), material.shininess); //Blinn-Phong Model
+    }
+    
+    
     // attenuation
     float distance    = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + 
