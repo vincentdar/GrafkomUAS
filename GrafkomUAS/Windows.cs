@@ -218,29 +218,31 @@ namespace GrafkomUAS
             lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
                 new Vector3(1.0f, 1.0f, 1.0f), new Vector3(1.0f, 1.0f, 1.0f), 0.5f, 0.5f, 0.5f));
             lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
-                new Vector3(1.0f, 0.0f, 0.0f), new Vector3(1.0f, 0.0f, 0.0f), 0.5f, 0.5f, 0.5f));
+                new Vector3(1.0f, 1.0f, 1.0f), new Vector3(1.0f, 1.0f, 1.0f), 0.5f, 0.5f, 0.5f));
             lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
-                new Vector3(0.0f, 1.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f), 0.5f, 0.5f, 0.5f));
+                new Vector3(1.0f, 1.0f, 1.0f), new Vector3(0.0f, 1.0f, 1.0f), 0.5f, 0.5f, 0.5f));
 
             mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/floor.obj");
             mesh0.setupObject(1.0f, 1.0f);
             mesh0.translate(new Vector3(0f, -0.5f, 0f));
 
-            mesh1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/dodocoSmall.obj");
+            mesh1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/Castle3.obj");
             mesh1.setupObject(1.0f, 1.0f);
             mesh1.translate(new Vector3(0f, 0.0f, 0f));
+            //mesh1.scale(10f);
+            lights[0].Position = new Vector3(0f, 1f, 0f);
 
-            lamp0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCube.obj", false);
+            lamp0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
             lamp0.setupObject(1.0f, 1.0f);
             lamp0.translate(new Vector3(0.2f, 0.0f, 0.3f));
-            lights[0].Position = lamp0.getTransform().ExtractTranslation();
+            //lights[0].Position = lamp0.getTransform().ExtractTranslation();
 
-            lamp1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCube.obj", false);
+            lamp1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
             lamp1.setupObject(1.0f, 1.0f);
             lamp1.translate(new Vector3(-0.4f, 0.0f, 0.0f));
             lights[1].Position = lamp1.getTransform().ExtractTranslation();
 
-            lamp2 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCube.obj", false);
+            lamp2 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
             lamp2.setupObject(1.0f, 1.0f);
             lamp2.translate(new Vector3(0.0f, 0.6f, 0.0f));
             lights[2].Position = lamp2.getTransform().ExtractTranslation();
@@ -259,10 +261,9 @@ namespace GrafkomUAS
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             if (GLFW.GetTime() > 0.02)
             {
-                LampRevolution();
+                //LampRevolution();
                 GLFW.SetTime(0.0);
             }
-
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             if (postprocessing)
@@ -289,20 +290,14 @@ namespace GrafkomUAS
                 GL.Disable(EnableCap.DepthTest);
                 GL.Clear(ClearBufferMask.ColorBufferBit);
 
-
-
                 screenShader.Use();
                 screenShader.SetInt("screenTexture", texColorBuffer);
                 GL.BindVertexArray(_vao);
                 GL.BindTexture(TextureTarget.Texture2D, texColorBuffer);
                 GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
-
-
             }
             else
             {
-                
-
                 shader.Use();
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
                 GL.Enable(EnableCap.DepthTest);

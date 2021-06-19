@@ -325,9 +325,13 @@ namespace GrafkomUAS
                 meshobj.rotate(angleX, angleY, angleZ);
             }
         }
-        public void scale()
+        public void scale(float scale)
         {
-            transform = transform * Matrix4.CreateScale(1.9f);
+            transform = transform * Matrix4.CreateScale(scale);
+            foreach (var meshobj in child)
+            {
+                meshobj.scale(scale);
+            }
         }
         public void translate(Vector3 translation)
         {

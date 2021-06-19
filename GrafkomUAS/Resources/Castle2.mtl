@@ -1,0 +1,50 @@
+# Blender MTL File: 'None'
+# Material Count: 4
+
+newmtl Castle_Exterior_Tex
+Ns 179.999996
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump -bm 0.040000 Castle Exterior Texture Bump.jpg
+map_Kd CastleExteriorTexture.jpg
+
+newmtl Castle_Interior_Texture
+Ns 179.999996
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump -bm 0.040000 Castle Interior Texture Bump.jpg
+map_Kd CastleInteriorTexture.jpg
+
+newmtl Ground_and_Fountain_Tex
+Ns 179.999996
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump -bm 0.035000 Ground and Fountain Texture Bump.jpg
+map_Kd GroundandFountainTexture.jpg
+
+newmtl Towers_Doors_and_Windows_Tex
+Ns 179.999996
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump -bm 0.050000 Towers Doors and Windows Texture Bump.jpg
+map_Kd TowersDoorsandWindowsTexture.jpg

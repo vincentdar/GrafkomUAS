@@ -94,7 +94,7 @@ void main()
     vec3 viewDir = normalize(viewPos - FragPos);
     
     vec3 result = vec3(0.0, 0.0, 0.0);
-    for(int i = 0; i < 3; i++)
+    for(int i = 0; i < 1; i++)
     {
         result += CalcPointLight(lights[i], norm, FragPos, viewDir, material);
     }
