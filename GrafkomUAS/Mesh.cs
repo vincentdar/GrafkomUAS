@@ -1,9 +1,7 @@
 ﻿using LearnOpenTK.Common;
-using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using OpenTK.Graphics.OpenGL4;
 
 namespace GrafkomUAS
@@ -19,18 +17,27 @@ namespace GrafkomUAS
         string name;
         int _vbo;
         int _vao;
-        Shader _shader;
+        int _depthMapFBO;
+
         Matrix4 transform;
         Matrix4 view;
         Matrix4 projection;
 
+        Shader _shader;
+        Shader _depthShader;
+        //
         bool blinn = false;
+        bool gamma = false;
         private Texture _diffuseMap;
         private Texture _specularMap;
 
 
         //Hirarki pada parent
         public List<Mesh> child = new List<Mesh>();
+        public Mesh()
+        {
+
+        }
         public Mesh(string vertPath, string fragPath)
         {
             _shader = new Shader(vertPath, fragPath);
@@ -92,9 +99,13 @@ namespace GrafkomUAS
             GL.EnableVertexAttribArray(texCoordLocation);
             GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
 
+
+            
+
             //Camera
-            view = Matrix4.CreateTranslation(0.0f, 0.0f, -3.0f);
-            projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), sizeX / sizeY, 0.1f, 100.0f);
+            view = Matrix4.CreateTranslation(1.0f, 0.0f, 3.0f);
+            //projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), sizeX / sizeY, 0.1f, 100.0f);
+            projection = Matrix4.CreateOrthographic(800, 600, 0.1f, 100.0f);
 
             //Diffuse and specular map
             if(material != null)
@@ -104,16 +115,16 @@ namespace GrafkomUAS
             }
             
             //Materials
-            Console.WriteLine("================================================");
-            Console.WriteLine("Object Name: " + name);
-            Console.WriteLine("Vertices: " + vertices.Count);
-            Console.WriteLine("Normals: " + normals.Count);
-            Console.WriteLine("TextureVertices: " + textureVertices.Count);
-            if(material != null)
-            {
-                material.DisplayAttribute();
-            }
-            Console.WriteLine("================================================");
+            //Console.WriteLine("================================================");
+            //Console.WriteLine("Object Name: " + name);
+            //Console.WriteLine("Vertices: " + vertices.Count);
+            //Console.WriteLine("Normals: " + normals.Count);
+            //Console.WriteLine("TextureVertices: " + textureVertices.Count);
+            //if(material != null)
+            //{
+            //    material.DisplayAttribute();
+            //}
+            //Console.WriteLine("================================================");
             
 
 
@@ -122,7 +133,7 @@ namespace GrafkomUAS
                 meshobj.setupObject(sizeX, sizeY);
             }
         }
-        public void render(Camera _camera, List<Light> light)
+        public void render(Camera _camera, List<Light> lights)
         {
             //render itu akan selalu terpanggil setiap frame
             GL.BindVertexArray(_vao);
@@ -131,17 +142,21 @@ namespace GrafkomUAS
                 _diffuseMap.Use(TextureUnit.Texture0);
                 _specularMap.Use(TextureUnit.Texture1);
             }
-            
-            _shader.Use();
 
-            
+            //_depthShader.Use();
+            //Process Depth Shader
+            //float near_plane = 1.0f, far_plane = 7.5f;
+            //Matrix4 lightProjection, lightView;
+            //Matrix4.CreateOrthographic(-10.0f, 10.0f, near_plane, far_plane, out lightProjection);
+            //lightView = Matrix4.LookAt(pointLight.Position, transform.ExtractTranslation(), new Vector3(0.0f, 1.0f, 0.0f));
+
+            //Matrix4 lightSpaceMatrix = lightProjection * lightView;
+            //_depthShader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
+
+            _shader.Use();
             _shader.SetMatrix4("transform", transform);
             _shader.SetMatrix4("view", _camera.GetViewMatrix());
             _shader.SetMatrix4("projection", _camera.GetProjectionMatrix());
-
-            //_shader.SetVector3("objectColor", new Vector3(1.0f, 0.5f, 0.31f));
-            //_shader.SetVector3("lightColor", new Vector3(1.0f, 1.0f, 1.0f));
-            //_shader.SetVector3("lightPos", _lightPos);
             _shader.SetVector3("viewPos", _camera.Position);
             ////material settings
             if(material != null)
@@ -163,9 +178,13 @@ namespace GrafkomUAS
                 _shader.SetFloat("material.shininess", 128.0f);
             }
 
-            for(int i = 0; i < light.Count; i++)
+            //Multiple Lights 
+            for(int i = 0; i < lights.Count; i++)
             {
-                PointLight pointLight = (PointLight)light[i];
+                PointLight pointLight = (PointLight)lights[i];
+
+                
+                //Process Lighting Shader
                 _shader.SetVector3("lights[" + i + "].position", pointLight.Position);
                 //_shader.SetVector3("lights[" + i + "].direction", new Vector3(-0.2f, -1.0f, -0.3f));
                 _shader.SetVector3("lights[" + i + "].ambient", pointLight.Ambient);
@@ -174,26 +193,115 @@ namespace GrafkomUAS
                 _shader.SetFloat("lights[" + i + "].linear", pointLight.Linear);
                 _shader.SetFloat("lights[" + i + "].constant", pointLight.Constant);
                 _shader.SetFloat("lights[" + i + "].quadratic", pointLight.Quadratic);
-                if(blinn)
-                {
-                    _shader.SetInt("blinn", 1);
-                }
-                else
-                {
-                    _shader.SetInt("blinn", 0);
-                }
+                //Use F1 key to toggle, default phong
+                _shader.SetBool("blinn", blinn);
+                _shader.SetBool("gamma", gamma);
+
                 
             }
-            
+
             GL.DrawArrays(PrimitiveType.Triangles, 0, vertices.Count);
 
             //ada disini
             foreach (var meshobj in child)
             {
-                meshobj.render(_camera, light);
+                meshobj.render(_camera, lights);
             }
         }
-        
+        public void calculateDepthRender(Camera _camera, Light light, int i)
+        {
+            GL.BindVertexArray(_vao);
+            if (material != null)
+            {
+                _diffuseMap.Use(TextureUnit.Texture0);
+                //_specularMap.Use(TextureUnit.Texture1);
+            }
+            _depthShader.SetMatrix4("model", transform);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, vertices.Count);
+
+            foreach (var meshobj in child)
+            {
+                meshobj.calculateDepthRender(_camera, light, i);
+            }
+        }
+        public void calculateTextureRender(Camera _camera, Light light, int i)
+        {
+            //render itu akan selalu terpanggil setiap frame
+            GL.BindVertexArray(_vao);
+            if (material != null)
+            {
+                _diffuseMap.Use(TextureUnit.Texture0);
+                _specularMap.Use(TextureUnit.Texture1);
+            }
+
+            //_shader.Use();
+            _shader.SetMatrix4("transform", transform);
+            _shader.SetMatrix4("view", _camera.GetViewMatrix());
+            _shader.SetMatrix4("projection", _camera.GetProjectionMatrix());
+            _shader.SetVector3("viewPos", _camera.Position);
+            ////material settings
+            if (material != null)
+            {
+                _shader.SetInt("material.diffuse_sampler", 0);
+                _shader.SetInt("material.specular_sampler", 1);
+                _shader.SetVector3("material.ambient", material.Ambient);
+                _shader.SetVector3("material.diffuse", material.Diffuse);
+                _shader.SetVector3("material.specular", material.Specular);
+                _shader.SetFloat("material.shininess", material.Shininess);
+            }
+            else
+            {
+                _shader.SetInt("material.diffuse_sampler", 0);
+                _shader.SetInt("material.specular_sampler", 1);
+                _shader.SetVector3("material.ambient", new Vector3(0.1f));
+                _shader.SetVector3("material.diffuse", new Vector3(1.0f));
+                _shader.SetVector3("material.specular", new Vector3(1.0f));
+                _shader.SetFloat("material.shininess", 128.0f);
+            }
+            //Process Lighting Shader
+            _shader.SetVector3("lights[" + i + "].position", light.Position);
+
+
+            _shader.SetVector3("lights[" + i + "].ambient", light.Ambient);
+            _shader.SetVector3("lights[" + i + "].diffuse", light.Diffuse);
+            _shader.SetVector3("lights[" + i + "].specular", light.Specular);
+            if (light.GetType() == typeof(PointLight))
+            {
+                //Point Light Calculation
+                //Console.WriteLine("Point Light");
+                PointLight pointLight = (PointLight)light;
+                _shader.SetBool("lights[" + i + "].useDirection", false);
+                _shader.SetFloat("lights[" + i + "].linear", pointLight.Linear);
+                _shader.SetFloat("lights[" + i + "].constant", pointLight.Constant);
+                _shader.SetFloat("lights[" + i + "].quadratic", pointLight.Quadratic);
+            }
+            else if (light.GetType() == typeof(DirectionLight))
+            {
+                //Directional Light Calculation
+                DirectionLight directionLight = (DirectionLight)light;
+                //Console.WriteLine("Directional Light");
+                _shader.SetBool("lights[" + i + "].useDirection", true);
+                _shader.SetVector3("lights[" + i + "].direction", directionLight.Direction);
+
+            }
+            //Use F1 key to toggle, default phong
+            //Option
+            _shader.SetBool("blinn", blinn);
+            _shader.SetBool("gamma", gamma);
+
+
+
+
+
+
+            GL.DrawArrays(PrimitiveType.Triangles, 0, vertices.Count);
+
+            //ada disini
+            foreach (var meshobj in child)
+            {
+                meshobj.calculateTextureRender(_camera, light, i);
+            }
+        }
         
         
        
@@ -303,6 +411,15 @@ namespace GrafkomUAS
             return _shader;
         }
 
+        public void setDepthShader(Shader shader)
+        {
+            this._depthShader = shader;
+        }
+        public Shader getDepthShader()
+        {
+            return _depthShader;
+        }
+
         public void setDiffuseMap(Texture tex)
         {
             _diffuseMap = tex;
@@ -341,6 +458,15 @@ namespace GrafkomUAS
         public bool getBlinn()
         {
             return blinn;
+        }
+        public void setGamma(bool b)
+        {
+            gamma = b;
+        }
+
+        public bool getGamma()
+        {
+            return gamma;
         }
     }
 }

@@ -13,6 +13,7 @@ namespace LearnOpenTK.Common
         public static Texture LoadFromFile(string path)
         {
             // Generate handle
+
             int handle = GL.GenTexture();
 
             // Bind the handle
@@ -57,6 +58,16 @@ namespace LearnOpenTK.Common
                     PixelFormat.Bgra,
                     PixelType.UnsignedByte,
                     data.Scan0);
+
+                //GL.TexImage2D(TextureTarget.Texture2D,
+                //    0,
+                //    PixelInternalFormat.DepthComponent,
+                //    SHADOW_WIDTH,
+                //    SHADOW_HEIGHT,
+                //    0,
+                //    PixelFormat.DepthComponent,
+                //    PixelType.Float,
+                //    data.Scan0);
             }
 
             // Now that our texture is loaded, we can set a few settings to affect how the image appears on rendering.

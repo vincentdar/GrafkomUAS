@@ -7,22 +7,17 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using OpenTK.Graphics.OpenGL4;
-using System.Drawing;
-using System.Drawing.Imaging;
-using PixelFormat = OpenTK.Graphics.OpenGL4.PixelFormat;
 //using Pertemuan7;
 
 namespace GrafkomUAS
 {
-    class Windows : GameWindow
+    class WindowDirectional : GameWindow
     {
         private Mesh mesh0;
         private Mesh mesh1;
 
         private Mesh lamp0;
-        private Mesh lamp1;
-        private Mesh lamp2;
+
         Dictionary<string, List<Material>> materials_dict = new Dictionary<string, List<Material>>();
 
         private Camera _camera;
@@ -37,11 +32,13 @@ namespace GrafkomUAS
 
         //Frame Buffers
         int fbo;
+        int depthMapfbo;
 
         //Shader
         Shader shader;
         Shader screenShader;
-        Shader skyboxShader;
+        Shader depthShader;
+        Shader debugShader;
 
         //Quad Screen
         float[] quadVertices = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
@@ -57,57 +54,25 @@ namespace GrafkomUAS
         int _vao;
         int _vbo;
         int texColorBuffer;
+        
 
-        //Cubemap
-        int cubemap;
-        int _vao_cube;
-        int _vbo_cube;
-        float[] skyboxVertices = {
-        // positions          
-        -1.0f,  1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
+        float[] quadVerticesDepth = {
+            // positions        // texture Coords
+            -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
 
-        -1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f
+        };
+        int _vao_depth;
+        int _vbo_depth;
+        int depthMap;
+        const int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
 
-        -1.0f, -1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
-
-        -1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,
-
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f
-    };
-
-        public Windows(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
+        public WindowDirectional(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
         }
 
@@ -152,6 +117,7 @@ namespace GrafkomUAS
 
             //Add Texture to Frame Buffer
             GL.GenTextures(1, out texColorBuffer);
+            Console.WriteLine("Tex Color FBO: " + fbo);
             Console.WriteLine("TexColorBuffer: " + texColorBuffer);
             GL.BindTexture(TextureTarget.Texture2D, texColorBuffer);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, 800, 600, 0, PixelFormat.Rgb, PixelType.Float, IntPtr.Zero);
@@ -166,7 +132,7 @@ namespace GrafkomUAS
             GL.GenRenderbuffers(1, out rbo);
             GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, rbo);
             GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.Depth24Stencil8, 800, 600);
-            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, rbo);
 
             GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthStencilAttachment,
                 RenderbufferTarget.Renderbuffer, rbo);
@@ -180,29 +146,56 @@ namespace GrafkomUAS
                 Console.WriteLine("Screen Frame Buffer NOT complete");
             }
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+
+            //Added Depth Mapping shadow
+            depthShader = new Shader("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/ShadowMapping.vert",
+                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/ShadowMapping.frag");
+            depthShader.Use();
+
+            
+
+            //Depth FBO
+            GL.GenFramebuffers(1, out depthMapfbo);
+            //Create Depth Texture
+            GL.GenTextures(1, out depthMap);
+            Console.WriteLine("Depth Map FBO: " + depthMapfbo);
+            Console.WriteLine("Depth Map: " + depthMap);
+            GL.BindTexture(TextureTarget.Texture2D, depthMap);
+            GL.TexImage2D(TextureTarget.Texture2D,
+                    0,
+                    PixelInternalFormat.DepthComponent16,
+                    SHADOW_WIDTH,
+                    SHADOW_HEIGHT,
+                    0,
+                    PixelFormat.DepthComponent,
+                    PixelType.Float,
+                    IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, depthMapfbo);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, depthMap, 0);
+            GL.DrawBuffer(DrawBufferMode.None);
+            GL.ReadBuffer(ReadBufferMode.None);
+            if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) == FramebufferErrorCode.FramebufferComplete)
+            {
+                Console.WriteLine("Depth Frame Buffer Created");
+            }
+            else
+            {
+                Console.WriteLine("Depth Frame Buffer NOT complete");
+            }
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+
+            debugShader = new Shader("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/debugQuad.vert",
+                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/debugQuad.frag");
+            debugShader.Use();
+            debugShader.SetInt("depthMap", 0);
+
             //Initialize default material
             InitDefaultMaterial();
-            //Create Cube Map
-            CreateCubeMap();
-            skyboxShader = new Shader("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/skybox.vert",
-                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Shaders/skybox.frag");
 
-            //Vertices
-            //Inisialiasi VBO
-            _vbo_cube = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo_cube);
-            GL.BufferData(BufferTarget.ArrayBuffer, skyboxVertices.Length * sizeof(float),
-                skyboxVertices, BufferUsageHint.StaticDraw);
-
-            //Inisialisasi VAO
-            _vao_cube = GL.GenVertexArray();
-            GL.BindVertexArray(_vao_cube);
-            var vertexLocation = skyboxShader.GetAttribLocation("aPosition");
-            GL.EnableVertexAttribArray(vertexLocation);
-            GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-
-            skyboxShader.Use();
-            skyboxShader.SetInt("skybox", 4);
             //Screen Quad
             GL.GenVertexArrays(1, out _vao);
             GL.GenBuffers(1, out _vbo);
@@ -214,41 +207,38 @@ namespace GrafkomUAS
             GL.EnableVertexAttribArray(1);
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), 2 * sizeof(float));
 
+            //Screen Quad
+            GL.GenVertexArrays(1, out _vao_depth);
+            GL.GenBuffers(1, out _vbo_depth);
+            GL.BindVertexArray(_vbo_depth);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo_depth);
+            GL.BufferData(BufferTarget.ArrayBuffer, quadVerticesDepth.Length * sizeof(float), quadVerticesDepth, BufferUsageHint.StaticDraw);
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
+            GL.EnableVertexAttribArray(1);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
+
             //Light Position
-            lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
-                new Vector3(1.0f, 1.0f, 1.0f), new Vector3(1.0f, 1.0f, 1.0f), 0.5f, 0.5f, 0.5f));
-            lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
-                new Vector3(1.0f, 0.0f, 0.0f), new Vector3(1.0f, 0.0f, 0.0f), 0.5f, 0.5f, 0.5f));
-            lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
-                new Vector3(0.0f, 1.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f), 0.5f, 0.5f, 0.5f));
+            lights.Add(new DirectionLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
+                new Vector3(1.0f, 1.0f, 1.0f), new Vector3(1.0f, 1.0f, 1.0f), new Vector3(-0.3f, -0.3f, -0.3f)));
 
             mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/floor.obj");
             mesh0.setupObject(1.0f, 1.0f);
             mesh0.translate(new Vector3(0f, -0.5f, 0f));
 
-            mesh1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/dodocoSmall.obj");
+            mesh1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/oldEdited.obj");
             mesh1.setupObject(1.0f, 1.0f);
-            mesh1.translate(new Vector3(0f, 0.0f, 0f));
+            mesh1.translate(new Vector3(0f, 0.0f, 0.0f));
 
-            lamp0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCube.obj", false);
+            lamp0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/KleeBomb.obj", false);
             lamp0.setupObject(1.0f, 1.0f);
-            lamp0.translate(new Vector3(0.2f, 0.0f, 0.3f));
+            lamp0.translate(new Vector3(0.3f, 0.3f, 0.3f));
             lights[0].Position = lamp0.getTransform().ExtractTranslation();
 
-            lamp1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCube.obj", false);
-            lamp1.setupObject(1.0f, 1.0f);
-            lamp1.translate(new Vector3(-0.4f, 0.0f, 0.0f));
-            lights[1].Position = lamp1.getTransform().ExtractTranslation();
-
-            lamp2 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCube.obj", false);
-            lamp2.setupObject(1.0f, 1.0f);
-            lamp2.translate(new Vector3(0.0f, 0.6f, 0.0f));
-            lights[2].Position = lamp2.getTransform().ExtractTranslation();
 
 
-            var _cameraPosInit = new Vector3(0, 0, 0);
+            var _cameraPosInit = new Vector3(0.3f, 0.3f, 0.3f);
             _camera = new Camera(_cameraPosInit, Size.X / (float)Size.Y);
-            _camera.Fov = 90f;
             _camera.Yaw -= 90f;
             CursorGrabbed = true;
             base.OnLoad();
@@ -256,57 +246,82 @@ namespace GrafkomUAS
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
+            Console.WriteLine(_camera.Position);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             if (GLFW.GetTime() > 0.02)
             {
-                LampRevolution();
+                //LampRevolution();
                 GLFW.SetTime(0.0);
             }
 
+            //Depth Map Rendering
+            
+            //Process Depth Shader
+            float near_plane = 1.0f, far_plane = 7.5f;
+            Matrix4 lightProjection, lightView;
+            Matrix4.CreateOrthographic(-10.0f, 10.0f, near_plane, far_plane, out lightProjection);
+            lightView = Matrix4.LookAt(lights[0].Position, new Vector3(0.0f, 0.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f));
+            Matrix4 lightSpaceMatrix = lightProjection * lightView;
 
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             if (postprocessing)
             {
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
+                //GL.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
+                //GL.Enable(EnableCap.DepthTest);
+                //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+                ////Textured Rendering
+                //GL.ActiveTexture(TextureUnit.Texture0);
+                //shader.Use();
+                //for (int i = 0; i < lights.Count; i++)
+                //{
+                //    mesh0.calculateTextureRender(_camera, lights[i], i);
+                //    mesh1.calculateTextureRender(_camera, lights[i], i);
+                //    lamp0.calculateTextureRender(_camera, lights[i], i);
+                //}
+                //GL.BindVertexArray(0);
+
+                ////Default FrameBuffer
+                //GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                //GL.Disable(EnableCap.DepthTest);
+                //GL.Clear(ClearBufferMask.ColorBufferBit);
+
+                //screenShader.Use();
+                //screenShader.SetInt("screenTexture", texColorBuffer);
+                //GL.BindVertexArray(_vao);
+                //GL.BindTexture(TextureTarget.Texture2D, texColorBuffer);
+                //GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+
+                GL.Viewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, depthMapfbo);
                 GL.Enable(EnableCap.DepthTest);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
                 //Textured Rendering
                 GL.ActiveTexture(TextureUnit.Texture0);
-                shader.Use();
+                depthShader.Use();
+                depthShader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
                 for (int i = 0; i < lights.Count; i++)
                 {
-                    mesh0.calculateTextureRender(_camera, lights[i], i);
-                    mesh1.calculateTextureRender(_camera, lights[i], i);
-                    lamp0.calculateTextureRender(_camera, lights[i], i);
-                    lamp1.calculateTextureRender(_camera, lights[i], i);
-                    lamp2.calculateTextureRender(_camera, lights[i], i);
+                    //mesh0.calculateDepthRender(_camera, lights[i], i);
+                    mesh1.calculateDepthRender(_camera, lights[i], i);
+                    lamp0.calculateDepthRender(_camera, lights[i], i);
                 }
-
-                GL.BindVertexArray(0);
-
                 //Default FrameBuffer
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-                GL.Disable(EnableCap.DepthTest);
-                GL.Clear(ClearBufferMask.ColorBufferBit);
-
-
-
-                screenShader.Use();
-                screenShader.SetInt("screenTexture", texColorBuffer);
-                GL.BindVertexArray(_vao);
-                GL.BindTexture(TextureTarget.Texture2D, texColorBuffer);
+                GL.Viewport(0, 0, 800, 600);
+                GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+                debugShader.Use();
+                debugShader.SetInt("depthMap", 0);
+                GL.BindVertexArray(_vao_depth);
+                GL.ActiveTexture(TextureUnit.Texture0);
+                GL.BindTexture(TextureTarget.Texture2D, depthMap);
                 GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
-
-            }
-            else
-            {
-                
-
+                GL.Viewport(0, 0, 800, 600);
+                GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
                 shader.Use();
+                shader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
                 GL.Enable(EnableCap.DepthTest);
-                //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+                GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
                 //Textured Rendering
                 GL.ActiveTexture(TextureUnit.Texture0);
                 for (int i = 0; i < lights.Count; i++)
@@ -314,28 +329,27 @@ namespace GrafkomUAS
                     mesh0.calculateTextureRender(_camera, lights[i], i);
                     mesh1.calculateTextureRender(_camera, lights[i], i);
                     lamp0.calculateTextureRender(_camera, lights[i], i);
-                    lamp1.calculateTextureRender(_camera, lights[i], i);
-                    lamp2.calculateTextureRender(_camera, lights[i], i);
                 }
 
-                //Render Skybox
-                GL.DepthFunc(DepthFunction.Lequal);
-                //GL.DepthMask(false);
-                skyboxShader.Use();
-                Matrix4 skyview = _camera.GetViewMatrix().ClearTranslation().ClearScale();
-                skyboxShader.SetMatrix4("view", skyview);
-                
-                Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(_camera.Fov),
-                    Size.X / (float)Size.Y, 1f, 100f);
-                skyboxShader.SetMatrix4("projection", projection);
-                skyboxShader.SetInt("skybox", 4);
-                GL.BindVertexArray(_vao_cube);
-                GL.ActiveTexture(TextureUnit.Texture4);
-                GL.BindTexture(TextureTarget.TextureCubeMap, cubemap);
-                GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
-                GL.DepthFunc(DepthFunction.Less);
-
             }
+            else
+            {
+                GL.Viewport(0, 0, 800, 600);
+                GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+                shader.Use();
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                GL.Enable(EnableCap.DepthTest);
+                GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+                //Textured Rendering
+                GL.ActiveTexture(TextureUnit.Texture0);
+                for (int i = 0; i < lights.Count; i++)
+                {
+                    mesh0.calculateTextureRender(_camera, lights[i], i);
+                    mesh1.calculateTextureRender(_camera, lights[i], i);
+                    lamp0.calculateTextureRender(_camera, lights[i], i);
+                }
+            }
+
 
             SwapBuffers();
 
@@ -415,22 +429,18 @@ namespace GrafkomUAS
                 _camera.Position -= _camera.Up * cameraSpeed * (float)args.Time;
             }
             // Blinn
-            if(KeyboardState.IsKeyReleased(Keys.F1))
+            if (KeyboardState.IsKeyReleased(Keys.F1))
             {
                 mesh0.setBlinn(!mesh0.getBlinn());
                 lamp0.setBlinn(!lamp0.getBlinn());
-                lamp1.setBlinn(!lamp1.getBlinn());
-                lamp2.setBlinn(!lamp2.getBlinn());
 
             }
-            if(KeyboardState.IsKeyReleased(Keys.F2))
+            if (KeyboardState.IsKeyReleased(Keys.F2))
             {
                 mesh0.setGamma(!mesh0.getGamma());
                 lamp0.setGamma(!lamp0.getGamma());
-                lamp1.setGamma(!lamp1.getGamma());
-                lamp2.setGamma(!lamp2.getGamma());
             }
-            if(KeyboardState.IsKeyReleased(Keys.F3))
+            if (KeyboardState.IsKeyReleased(Keys.F3))
             {
                 postprocessing = !postprocessing;
             }
@@ -555,7 +565,7 @@ namespace GrafkomUAS
                     1.0f, diffuseMap, textureMap));
 
             materials_dict.Add("Default", materials);
-            
+
         }
 
         public Mesh LoadObjFile(string path, bool usemtl = true)
@@ -597,12 +607,12 @@ namespace GrafkomUAS
                     {
                         //Render tergantung nama dan objek apa sehingga bisa buat hirarki
                         case "o":
-                            if(mesh_count > 0)
+                            if (mesh_count > 0)
                             {
                                 Mesh mesh_tmp = new Mesh();
                                 //Attach Shader
                                 mesh_tmp.setShader(shader);
-                                mesh_tmp.setDepthShader(skyboxShader);
+                                mesh_tmp.setDepthShader(depthShader);
                                 for (int i = 0; i < temp_vertexIndices.Count; i++)
                                 {
                                     uint vertexIndex = temp_vertexIndices[i];
@@ -621,9 +631,9 @@ namespace GrafkomUAS
                                 mesh_tmp.setName(temp_name[mesh_created]);
 
                                 //Material
-                                if(usemtl)
+                                if (usemtl)
                                 {
-                                    
+
                                     List<Material> mtl = materials_dict[material_library];
                                     for (int i = 0; i < mtl.Count; i++)
                                     {
@@ -644,9 +654,9 @@ namespace GrafkomUAS
                                         }
                                     }
                                 }
-                                
-                                
-                                if(mesh_count == 1)
+
+
+                                if (mesh_count == 1)
                                 {
                                     mesh = mesh_tmp;
                                 }
@@ -673,7 +683,7 @@ namespace GrafkomUAS
                             temp_normals.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
                             break;
                         case "mtllib":
-                            if(usemtl)
+                            if (usemtl)
                             {
                                 string resourceName = "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/" + words[0];
                                 string nameWOExt = words[0].Split(".")[0];
@@ -681,10 +691,10 @@ namespace GrafkomUAS
                                 materials_dict.Add(nameWOExt, LoadMtlFile(resourceName));
                                 material_library = nameWOExt;
                             }
-                            
+
                             break;
                         case "usemtl":
-                            if(usemtl)
+                            if (usemtl)
                             {
                                 current_materialsName = words[0];
                             }
@@ -740,7 +750,7 @@ namespace GrafkomUAS
                 Mesh mesh_tmp = new Mesh();
                 //Attach Shader
                 mesh_tmp.setShader(shader);
-                mesh_tmp.setDepthShader(skyboxShader);
+                mesh_tmp.setDepthShader(depthShader);
                 for (int i = 0; i < temp_vertexIndices.Count; i++)
                 {
                     uint vertexIndex = temp_vertexIndices[i];
@@ -800,7 +810,7 @@ namespace GrafkomUAS
         public List<Material> LoadMtlFile(string path)
         {
             Console.WriteLine("Load MTL file");
-            List <Material> materials = new List<Material>();
+            List<Material> materials = new List<Material>();
             List<string> name = new List<string>();
             List<float> shininess = new List<float>();
             List<Vector3> ambient = new List<Vector3>();
@@ -832,11 +842,11 @@ namespace GrafkomUAS
                     switch (type)
                     {
                         case "newmtl":
-                            if(map_kd.Count < name.Count)
+                            if (map_kd.Count < name.Count)
                             {
                                 map_kd.Add("white.jpg");
                             }
-                            if(map_ka.Count < name.Count)
+                            if (map_ka.Count < name.Count)
                             {
                                 map_ka.Add("white.jpg");
                             }
@@ -880,9 +890,9 @@ namespace GrafkomUAS
             }
 
             Dictionary<string, Texture> texture_map_Kd = new Dictionary<string, Texture>();
-            for(int i = 0; i < map_kd.Count; i++)
+            for (int i = 0; i < map_kd.Count; i++)
             {
-                if(!texture_map_Kd.ContainsKey(map_kd[i]))
+                if (!texture_map_Kd.ContainsKey(map_kd[i]))
                 {
                     Console.WriteLine("List of map_Kd key: " + map_kd[i]);
                     texture_map_Kd.Add(map_kd[i],
@@ -902,68 +912,18 @@ namespace GrafkomUAS
 
             for (int i = 0; i < name.Count; i++)
             {
-                materials.Add(new Material(name[i], shininess[i], ambient[i], diffuse[i], specular[i], 
+                materials.Add(new Material(name[i], shininess[i], ambient[i], diffuse[i], specular[i],
                     alpha[i], texture_map_Kd[map_kd[i]], texture_map_Ka[map_ka[i]]));
             }
 
             return materials;
         }
 
-        //CubeMap
-        public void CreateCubeMap()
-        {
-            string[] skyboxPath =
-            {
-                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/Skybox/sky-7.png",
-                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/Skybox/sky-7.png",
-                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/Skybox/sky-7.png",
-                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/Skybox/sky-7.png",
-                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/Skybox/sky-7.png",
-                "C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/Skybox/sky-7.png",
-            };
-            GL.GenTextures(1, out cubemap);
-            GL.BindTexture(TextureTarget.TextureCubeMap, cubemap);
-            Console.WriteLine("Cubemap: " + cubemap);
-            for (int i = 0; i < skyboxPath.Length; i++)
-            {
-                using (var image = new Bitmap(skyboxPath[i]))
-                {
-                    Console.WriteLine(skyboxPath[i] + " LOADED");
-                    
-                    var data = image.LockBits(
-                        new Rectangle(0, 0, image.Width, image.Height),
-                        ImageLockMode.ReadOnly,
-                        System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-                    GL.TexImage2D(TextureTarget.TextureCubeMapPositiveX + i,
-                        0,
-                        PixelInternalFormat.Rgb,
-                        1280,
-                        1280,
-                        0,
-                        PixelFormat.Bgra,
-                        PixelType.UnsignedByte,
-                        data.Scan0);
-                }
-                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
-
-            }
-            
-
-        }
         //Animation
         public void LampRevolution()
         {
             lights[0].Position = lamp0.getTransform().ExtractTranslation();
             lamp0.rotate(0f, 1.0f, 0.0f);
-            lights[1].Position = lamp1.getTransform().ExtractTranslation();
-            lamp1.rotate(0f, -1f, 0.0f);
-            lights[2].Position = lamp2.getTransform().ExtractTranslation();
-            lamp2.rotate(1f, 0f, 0f);
         }
     }
 }

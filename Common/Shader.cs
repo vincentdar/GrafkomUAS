@@ -185,5 +185,24 @@ namespace LearnOpenTK.Common
             GL.UseProgram(Handle);
             GL.Uniform3(_uniformLocations[name], data);
         }
+
+        /// <summary>
+        /// Set a uniform bool on this shader.
+        /// </summary>
+        /// <param name="name">The name of the uniform</param>
+        /// <param name="data">The data to set</param>
+        public void SetBool(string name, bool data)
+        {
+            GL.UseProgram(Handle);
+            if(data)
+            {
+                GL.Uniform1(_uniformLocations[name], 1);
+            }
+            else
+            {
+                GL.Uniform1(_uniformLocations[name], 0);
+            }
+            
+        }
     }
 }
