@@ -19,10 +19,11 @@ namespace GrafkomUAS
     {
         private Mesh mesh0;
         private Mesh mesh1;
+        private Mesh mesh2;
+        private Mesh mesh3;
+        private Mesh mesh4;
+        private Mesh mesh5;
 
-        private Mesh lamp0;
-        private Mesh lamp1;
-        private Mesh lamp2;
         Dictionary<string, List<Material>> materials_dict = new Dictionary<string, List<Material>>();
 
         private Camera _camera;
@@ -218,37 +219,51 @@ namespace GrafkomUAS
             lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
                 new Vector3(1.0f, 1.0f, 1.0f), new Vector3(1.0f, 1.0f, 1.0f), 0.5f, 0.5f, 0.5f));
             lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
-                new Vector3(1.0f, 1.0f, 1.0f), new Vector3(1.0f, 1.0f, 1.0f), 0.5f, 0.5f, 0.5f));
+                new Vector3(0.0f, 1.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f), 0.5f, 0.5f, 0.5f));
             lights.Add(new PointLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
-                new Vector3(1.0f, 1.0f, 1.0f), new Vector3(0.0f, 1.0f, 1.0f), 0.5f, 0.5f, 0.5f));
+                new Vector3(0.0f, 0.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f), 0.5f, 0.5f, 0.5f));
+            lights.Add(new DirectionLight(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.05f, 0.05f, 0.05f),
+                new Vector3(1.0f, 1.0f, 1.0f), new Vector3(0.0f, 1.0f, 1.0f), new Vector3(1f, 1f, 1f)));
 
-            mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/floor.obj");
+            //Initialize Mesh here
+            mesh0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/MeteorInverted.obj");
             mesh0.setupObject(1.0f, 1.0f);
-            mesh0.translate(new Vector3(0f, -0.5f, 0f));
+            mesh0.scale(5f);
+            
 
-            mesh1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/Castle3.obj");
+            mesh1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/meguminfinal.obj");
             mesh1.setupObject(1.0f, 1.0f);
-            mesh1.translate(new Vector3(0f, 0.0f, 0f));
-            //mesh1.scale(10f);
-            lights[0].Position = new Vector3(0f, 1f, 0f);
+            mesh1.translate(new Vector3(0f, 0f, 0f));
+            mesh1.scale(2f);
 
-            lamp0 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
-            lamp0.setupObject(1.0f, 1.0f);
-            lamp0.translate(new Vector3(0.2f, 0.0f, 0.3f));
-            //lights[0].Position = lamp0.getTransform().ExtractTranslation();
+            mesh2 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/Castle3.obj");
+            mesh2.setupObject(1.0f, 1.0f);
+            mesh2.translate(new Vector3(0f, -0.21f, 0f));
 
-            lamp1 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
-            lamp1.setupObject(1.0f, 1.0f);
-            lamp1.translate(new Vector3(-0.4f, 0.0f, 0.0f));
-            lights[1].Position = lamp1.getTransform().ExtractTranslation();
+            mesh3 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/dodocoSmall.obj");
+            mesh3.setupObject(1.0f, 1.0f);
+            mesh3.rotate(0f, 45f, 0f);
+            mesh3.translate(new Vector3(-0.5f, 0f, 0f));
+            mesh3.scale(3f);
 
-            lamp2 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/TestCubeInverted.obj", false);
-            lamp2.setupObject(1.0f, 1.0f);
-            lamp2.translate(new Vector3(0.0f, 0.6f, 0.0f));
-            lights[2].Position = lamp2.getTransform().ExtractTranslation();
+            mesh4 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/dodocoTail.obj");
+            mesh4.setupObject(1.0f, 1.0f);
+            mesh4.translate(new Vector3(0.5f, 0f, 0f));
+            mesh4.scale(2f);
+
+            mesh5 = LoadObjFile("C:/Users/vince/source/repos/GrafkomUAS/GrafkomUAS/Resources/Chomusuke.obj");
+            mesh5.setupObject(1.0f, 1.0f);
+            mesh5.scale(0.2f);
+            mesh5.rotate(0f, 180f, 0f);
+            _objectPos = mesh5.getTransform().ExtractTranslation();
+
+            //lights[0].Position = new Vector3(-0.2f, 0.3f, 0.3f);
+            lights[0].Position = new Vector3(0.0f, 1.5f, -0.3f);
+            lights[1].Position = new Vector3(0.0f, 3f, -1.0f);
+            lights[2].Position = new Vector3(0.0f, 0.5f, 2.0f);
 
 
-            var _cameraPosInit = new Vector3(0, 0, 0);
+            var _cameraPosInit = new Vector3(0, 0.5f, 1f);
             _camera = new Camera(_cameraPosInit, Size.X / (float)Size.Y);
             _camera.Fov = 90f;
             _camera.Yaw -= 90f;
@@ -258,10 +273,11 @@ namespace GrafkomUAS
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
+            
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             if (GLFW.GetTime() > 0.02)
             {
-                //LampRevolution();
+                LampRevolution();
                 GLFW.SetTime(0.0);
             }
 
@@ -278,9 +294,10 @@ namespace GrafkomUAS
                 {
                     mesh0.calculateTextureRender(_camera, lights[i], i);
                     mesh1.calculateTextureRender(_camera, lights[i], i);
-                    lamp0.calculateTextureRender(_camera, lights[i], i);
-                    lamp1.calculateTextureRender(_camera, lights[i], i);
-                    lamp2.calculateTextureRender(_camera, lights[i], i);
+                    mesh2.calculateTextureRender(_camera, lights[i], i);
+                    mesh3.calculateTextureRender(_camera, lights[i], i);
+                    mesh4.calculateTextureRender(_camera, lights[i], i);
+                    mesh5.calculateTextureRender(_camera, lights[i], i);
                 }
 
                 GL.BindVertexArray(0);
@@ -308,9 +325,10 @@ namespace GrafkomUAS
                 {
                     mesh0.calculateTextureRender(_camera, lights[i], i);
                     mesh1.calculateTextureRender(_camera, lights[i], i);
-                    lamp0.calculateTextureRender(_camera, lights[i], i);
-                    lamp1.calculateTextureRender(_camera, lights[i], i);
-                    lamp2.calculateTextureRender(_camera, lights[i], i);
+                    mesh2.calculateTextureRender(_camera, lights[i], i);
+                    mesh3.calculateTextureRender(_camera, lights[i], i);
+                    mesh4.calculateTextureRender(_camera, lights[i], i);
+                    mesh5.calculateTextureRender(_camera, lights[i], i);
                 }
 
                 //Render Skybox
@@ -339,6 +357,7 @@ namespace GrafkomUAS
 
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
+            //Console.WriteLine("Camera Position" + _camera.Position + " Object Position: " + _objectPos);
             const float cameraSpeed = 1.5f;
             // Escape keyboard
             if (KeyboardState.IsKeyDown(Keys.Escape))
@@ -348,12 +367,12 @@ namespace GrafkomUAS
             // Zoom in
             if (KeyboardState.IsKeyDown(Keys.I))
             {
-                _camera.Fov -= 0.05f;
+                _camera.Fov -= 0.5f;
             }
             // Zoom out
             if (KeyboardState.IsKeyDown(Keys.O))
             {
-                _camera.Fov += 0.05f;
+                _camera.Fov += 0.5f;
             }
 
             // Rotasi X di pivot Camera
@@ -382,22 +401,40 @@ namespace GrafkomUAS
             // Maju (W)
             if (KeyboardState.IsKeyDown(Keys.W))
             {
-                _camera.Position += _camera.Front * cameraSpeed * (float)args.Time;
+                //_camera.Position += _camera.Front * cameraSpeed * (float)args.Time;
+                //_objectPos += _camera.Position;
+                mesh5.translate(new Vector3(0, 0, -1) * cameraSpeed * (float)args.Time);
+                Vector3 vec = mesh5.getTransform().ExtractTranslation();
+                _camera.Position = new Vector3(vec.X, vec.Y + 0.5f, vec.Z + 0.5f);
+
             }
             // Mundur (S)
             if (KeyboardState.IsKeyDown(Keys.S))
             {
-                _camera.Position -= _camera.Front * cameraSpeed * (float)args.Time;
+                //_camera.Position -= _camera.Front * cameraSpeed * (float)args.Time;
+                //_objectPos += _camera.Position;
+                mesh5.translate(-(new Vector3(0, 0, -1) * cameraSpeed * (float)args.Time));
+                Vector3 vec = mesh5.getTransform().ExtractTranslation();
+                _camera.Position = new Vector3(vec.X, vec.Y + 0.5f, vec.Z + 0.5f);
             }
             // Kiri (A)
             if (KeyboardState.IsKeyDown(Keys.A))
             {
-                _camera.Position -= _camera.Right * cameraSpeed * (float)args.Time;
+                //_camera.Position -= new Vector3(1, 0, 0) * cameraSpeed * (float)args.Time;
+                //_objectPos += _camera.Position;
+                mesh5.translate(-(new Vector3(1, 0, 0) * cameraSpeed * (float)args.Time));
+                Vector3 vec = mesh5.getTransform().ExtractTranslation();
+                _camera.Position = new Vector3(vec.X, vec.Y + 0.5f, vec.Z + 0.5f);
             }
             // Kanan (D)
             if (KeyboardState.IsKeyDown(Keys.D))
             {
-                _camera.Position += _camera.Right * cameraSpeed * (float)args.Time;
+                //_camera.Position += new Vector3(1, 0, 0) * cameraSpeed * (float)args.Time;
+                //_objectPos += _camera.Position;
+                mesh5.translate((new Vector3(1, 0, 0) * cameraSpeed * (float)args.Time));
+                Vector3 vec = mesh5.getTransform().ExtractTranslation();
+                _camera.Position = new Vector3(vec.X, vec.Y + 0.5f, vec.Z + 0.5f);
+
             }
             // Naik (Spasi)
             if (KeyboardState.IsKeyDown(Keys.Space))
@@ -413,24 +450,28 @@ namespace GrafkomUAS
             if(KeyboardState.IsKeyReleased(Keys.F1))
             {
                 mesh0.setBlinn(!mesh0.getBlinn());
-                lamp0.setBlinn(!lamp0.getBlinn());
-                lamp1.setBlinn(!lamp1.getBlinn());
-                lamp2.setBlinn(!lamp2.getBlinn());
+                mesh1.setBlinn(!mesh1.getBlinn());
+                mesh2.setBlinn(!mesh2.getBlinn());
+                mesh3.setBlinn(!mesh3.getBlinn());
+                mesh4.setBlinn(!mesh4.getBlinn());
+                mesh5.setBlinn(!mesh5.getBlinn());
 
             }
             if(KeyboardState.IsKeyReleased(Keys.F2))
             {
                 mesh0.setGamma(!mesh0.getGamma());
-                lamp0.setGamma(!lamp0.getGamma());
-                lamp1.setGamma(!lamp1.getGamma());
-                lamp2.setGamma(!lamp2.getGamma());
+                mesh1.setGamma(!mesh1.getGamma());
+                mesh2.setGamma(!mesh2.getGamma());
+                mesh3.setGamma(!mesh3.getGamma());
+                mesh4.setGamma(!mesh4.getGamma());
+                mesh5.setGamma(!mesh5.getGamma());
             }
             if(KeyboardState.IsKeyReleased(Keys.F3))
             {
                 postprocessing = !postprocessing;
             }
 
-            const float _rotationSpeed = 0.02f;
+            const float _rotationSpeed = 0.1f;
             // K (atas -> Rotasi sumbu x)
             if (KeyboardState.IsKeyDown(Keys.K))
             {
@@ -496,7 +537,7 @@ namespace GrafkomUAS
                 var axis = new Vector3(0, 0, 1);
                 _camera.Position -= _objectPos;
                 _camera.Position = Vector3.Transform(_camera.Position,
-                    generateArbRotationMatrix(axis, _objectPos, _rotationSpeed).ExtractRotation());
+                    generateArbRotationMatrix(axis, mesh5.getTransform().ExtractTranslation(), _rotationSpeed).ExtractRotation());
                 _camera.Position += _objectPos;
 
                 _camera._front = -Vector3.Normalize(_camera.Position - _objectPos);
@@ -509,7 +550,7 @@ namespace GrafkomUAS
                 var axis = new Vector3(0, 0, 1);
                 _camera.Position -= _objectPos;
                 _camera.Position = Vector3.Transform(_camera.Position,
-                    generateArbRotationMatrix(axis, _objectPos, -_rotationSpeed).ExtractRotation());
+                    generateArbRotationMatrix(axis, mesh5.getTransform().ExtractTranslation(), -_rotationSpeed).ExtractRotation());
                 _camera.Position += _objectPos;
 
                 _camera._front = -Vector3.Normalize(_camera.Position - _objectPos);
@@ -534,8 +575,32 @@ namespace GrafkomUAS
                 var deltaY = MouseState.Y - _lastMousePosition.Y;
                 _lastMousePosition = new Vector2(MouseState.X, MouseState.Y);
 
-                _camera.Yaw += deltaX * sensitivity;
-                _camera.Pitch -= deltaY * sensitivity;
+                
+                //YAW
+                _objectPos *= 2;
+                var axisYaw = new Vector3(0, 1, 0);
+                _camera.Position -= mesh5.getTransform().ExtractTranslation();
+                _camera.Yaw += deltaX * _rotationSpeed * sensitivity * 0.1f;
+                _camera.Position = Vector3.Transform(_camera.Position,
+                    generateArbRotationMatrix(axisYaw, mesh5.getTransform().ExtractTranslation(), deltaX).ExtractRotation());
+                _camera.Position += mesh5.getTransform().ExtractTranslation();
+
+                _camera._front = -Vector3.Normalize(_camera.Position - mesh5.getTransform().ExtractTranslation());
+                _objectPos /= 2;
+
+                //Pitch
+                _objectPos *= 2;
+                var axisPitch = new Vector3(1, 0, 0);
+                _camera.Position -= mesh5.getTransform().ExtractTranslation();
+                _camera.Pitch -= deltaY * _rotationSpeed * sensitivity * 0.1f;
+                _camera.Position = Vector3.Transform(_camera.Position,
+                    generateArbRotationMatrix(axisPitch, mesh5.getTransform().ExtractTranslation(), deltaY).ExtractRotation());
+                _camera.Position += mesh5.getTransform().ExtractTranslation();
+
+                _camera._front = -Vector3.Normalize(_camera.Position - mesh5.getTransform().ExtractTranslation());
+                _objectPos /= 2;
+                //_camera.Yaw += deltaX * sensitivity;
+                //_camera.Pitch -= deltaY * sensitivity;
             }
 
             base.OnUpdateFrame(args);
@@ -953,12 +1018,12 @@ namespace GrafkomUAS
         //Animation
         public void LampRevolution()
         {
-            lights[0].Position = lamp0.getTransform().ExtractTranslation();
-            lamp0.rotate(0f, 1.0f, 0.0f);
-            lights[1].Position = lamp1.getTransform().ExtractTranslation();
-            lamp1.rotate(0f, -1f, 0.0f);
-            lights[2].Position = lamp2.getTransform().ExtractTranslation();
-            lamp2.rotate(1f, 0f, 0f);
+            //lights[0].Position = lamp0.getTransform().ExtractTranslation();
+            //lamp0.rotate(0f, 1.0f, 0.0f);
+            //lights[1].Position = lamp1.getTransform().ExtractTranslation();
+            //lamp1.rotate(0f, -1f, 0.0f);
+            ////lights[2].Position = lamp2.getTransform().ExtractTranslation();
+            ////lamp2.rotate(1f, 0f, 0f);
         }
     }
 }

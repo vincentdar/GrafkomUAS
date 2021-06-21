@@ -17,7 +17,6 @@ namespace GrafkomUAS
         string name;
         int _vbo;
         int _vao;
-        int _depthMapFBO;
 
         Matrix4 transform;
         Matrix4 view;
@@ -113,22 +112,22 @@ namespace GrafkomUAS
                 _diffuseMap = material.Map_Kd;
                 _specularMap = material.Map_Ka;
             }
-            
+
             //Materials
             //Console.WriteLine("================================================");
             //Console.WriteLine("Object Name: " + name);
             //Console.WriteLine("Vertices: " + vertices.Count);
             //Console.WriteLine("Normals: " + normals.Count);
             //Console.WriteLine("TextureVertices: " + textureVertices.Count);
-            //if(material != null)
+            //if (material != null)
             //{
             //    material.DisplayAttribute();
             //}
             //Console.WriteLine("================================================");
-            
 
 
-            foreach(var meshobj in child)
+
+            foreach (var meshobj in child)
             {
                 meshobj.setupObject(sizeX, sizeY);
             }
